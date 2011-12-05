@@ -14,11 +14,13 @@ class Provider implements AuthenticationProviderInterface
 {
 	private $userProvider;
 	private $cacheDir;
+	private $lifetime;
 
-	public function __construct(UserProviderInterface $userProvider, $cacheDir)
+	public function __construct(UserProviderInterface $userProvider, $cacheDir=null, $lifetime=300)
 	{
 		$this->userProvider = $userProvider;
 		$this->cacheDir = $cacheDir;
+		$this->lifetime = $lifetime;
 	}
 
 	public function authenticate(TokenInterface $token)
@@ -38,20 +40,21 @@ class Provider implements AuthenticationProviderInterface
 
 	protected function validateDigest($digest, $nonce, $created, $secret)
 	{
-		//expire timestamp after 5 minutes
-		if(time() - strtotime($created) > 300)
+		//expire timestamp after specified lifetime
+		if(time() - strtotime($created) > $this->lifetime)
 			return false;
 
-//		//validate nonce is unique within 5 minutes
-//		if(file_exists($this->cacheDir.'/'.$nonce) && file_get_contents($this->cacheDir.'/'.$nonce) + 300 < time())
-//			throw new NonceExpiredException('Previously used nonce detected');
+		if($this->cacheDir)
+		{
+			//validate nonce is unique within 5 minutes
+			if(file_exists($this->cacheDir.'/'.$nonce) && file_get_contents($this->cacheDir.'/'.$nonce) + $this->lifetime < time())
+				throw new NonceExpiredException('Previously used nonce detected');
 
-//@todo store nonces
-//		file_put_contents($this->cacheDir.'/'.$nonce, time());
+			file_put_contents($this->cacheDir.'/'.$nonce, time());
+		}
 
 		//validate secret
-		//$expected = base64_encode(sha1(base64_decode($nonce.$created.$secret)/* .$created.$secret */, true));
-		$expected = base64_encode(sha1(base64_decode($nonce).$created.$secret, true));
+		$expected = base64_encode(sha1(base64_decode($nonce.$created.$secret), true));
 
 		return $digest === $expected;
 	}

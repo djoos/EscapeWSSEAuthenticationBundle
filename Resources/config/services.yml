@@ -1,7 +1,7 @@
 services:
     wsse.security.authentication.provider:
         class:  %wsse.authentication.provider.class%
-        arguments: ['', %kernel.cache_dir%/security/nonces]
+        arguments: ['', %wsse.authentication.provider.cache_dir%]
 
     wsse.security.authentication.listener:
         class:  %wsse.authentication.listener.class%
