@@ -39,8 +39,8 @@ class Factory implements SecurityFactoryInterface
 	{
 		$node
 			->children()
-				->scalarNode('lifetime')->defaultValue(300)
-				->scalarNode('nonce_dir')->defaultValue('')
+				->scalarNode('lifetime')->defaultValue(300)->end()
+				->scalarNode('nonce_dir')->defaultValue(null)->end()
 			->end()
 		;
 	}
