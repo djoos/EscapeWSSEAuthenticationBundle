@@ -16,7 +16,8 @@ class Factory implements SecurityFactoryInterface
 		$container
 			->setDefinition($providerId, new DefinitionDecorator('wsse.security.authentication.provider'))
 			->replaceArgument(0, new Reference($userProvider))
-			->replaceArgument(1, $config['lifetime']);
+			->replaceArgument(1, $config['nonce_dir'])
+			->replaceArgument(2, $config['lifetime']);
 
 		$listenerId = 'security.authentication.listener.wsse.'.$id;
 		$listener = $container->setDefinition($listenerId, new DefinitionDecorator('wsse.security.authentication.listener'));
@@ -39,6 +40,7 @@ class Factory implements SecurityFactoryInterface
 		$node
 			->children()
 				->scalarNode('lifetime')->defaultValue(300)
+				->scalarNode('nonce_dir')->defaultValue('')
 			->end()
 		;
 	}

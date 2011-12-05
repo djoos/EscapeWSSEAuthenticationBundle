@@ -1,7 +1,6 @@
 services:
     wsse.security.authentication.provider:
         class:  %wsse.authentication.provider.class%
-        arguments: ['', %wsse.authentication.provider.cache_dir%]
 
     wsse.security.authentication.listener:
         class:  %wsse.authentication.listener.class%

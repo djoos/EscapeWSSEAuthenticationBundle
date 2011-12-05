@@ -16,7 +16,7 @@ class Provider implements AuthenticationProviderInterface
 	private $cacheDir;
 	private $lifetime;
 
-	public function __construct(UserProviderInterface $userProvider, $cacheDir=null, $lifetime=300)
+	public function __construct(UserProviderInterface $userProvider, $cacheDir=null, $lifetime=null)
 	{
 		$this->userProvider = $userProvider;
 		$this->cacheDir = $cacheDir;
