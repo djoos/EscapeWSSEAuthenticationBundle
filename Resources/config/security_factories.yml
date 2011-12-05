@@ -1,0 +1,5 @@
+services:
+    security.authentication.factory.wsse:
+        class:  %wsseauthentication.factory.class%
+        tags:
+            - { name: security.listener.factory }
