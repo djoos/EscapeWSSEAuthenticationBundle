@@ -13,13 +13,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class Provider implements AuthenticationProviderInterface
 {
 	private $userProvider;
-	private $cacheDir;
+	private $nonceDir;
 	private $lifetime;
 
-	public function __construct(UserProviderInterface $userProvider, $cacheDir=null, $lifetime=null)
+	public function __construct(UserProviderInterface $userProvider, $nonceDir=null, $lifetime=null)
 	{
 		$this->userProvider = $userProvider;
-		$this->cacheDir = $cacheDir;
+		$this->nonceDir = $nonceDir;
 		$this->lifetime = $lifetime;
 	}
 
@@ -44,13 +44,13 @@ class Provider implements AuthenticationProviderInterface
 		if(time() - strtotime($created) > $this->lifetime)
 			return false;
 
-		if($this->cacheDir)
+		if($this->nonceDir)
 		{
 			//validate nonce is unique within 5 minutes
-			if(file_exists($this->cacheDir.'/'.$nonce) && file_get_contents($this->cacheDir.'/'.$nonce) + $this->lifetime < time())
+			if(file_exists($this->nonceDir.'/'.$nonce) && file_get_contents($this->nonceDir.'/'.$nonce) + $this->lifetime < time())
 				throw new NonceExpiredException('Previously used nonce detected');
 
-			file_put_contents($this->cacheDir.'/'.$nonce, time());
+			file_put_contents($this->nonceDir.'/'.$nonce, time());
 		}
 
 		//validate secret
