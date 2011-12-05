@@ -1,8 +1,8 @@
 services:
     wsse.security.authentication.provider:
-        class:  %wsseauthentication.provider.class%
+        class:  %wsse.authentication.provider.class%
         arguments: ['', %kernel.cache_dir%/security/nonces]
 
     wsse.security.authentication.listener:
-        class:  %wsseauthentication.listener.class%
+        class:  %wsse.authentication.listener.class%
         arguments: [@security.context, @security.authentication.manager]

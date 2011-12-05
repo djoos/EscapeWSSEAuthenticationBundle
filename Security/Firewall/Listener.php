@@ -2,7 +2,7 @@
 
 namespace Escape\WSSEAuthenticationBundle\Security\Firewall;
 
-use Escape\WSSEAuthenticationBundle\Security\Authentication\Token\UserToken;
+use Escape\WSSEAuthenticationBundle\Security\Authentication\Token\Token;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -33,9 +33,8 @@ class Listener implements ListenerInterface
 
 			if(preg_match($wsseRegex, $request->headers->get('X-WSSE'), $matches))
 			{
-				$token = new UserToken();
+				$token = new Token();
 				$token->setUser($matches[1]);
-
 				$token->digest = $matches[2];
 				$token->nonce = $matches[3];
 				$token->created = $matches[4];

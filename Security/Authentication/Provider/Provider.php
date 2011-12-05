@@ -2,7 +2,7 @@
 
 namespace Escape\WSSEAuthenticationBundle\Security\Authentication\Provider;
 
-use Escape\WSSEAuthenticationBundle\Security\Authentication\Token\UserToken;
+use Escape\WSSEAuthenticationBundle\Security\Authentication\Token\Token;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -27,13 +27,13 @@ class Provider implements AuthenticationProviderInterface
 
 		if($user && $this->validateDigest($token->digest, $token->nonce, $token->created, $user->getPassword()))
 		{
-			$authenticatedToken = new UserToken($user->getRoles());
+			$authenticatedToken = new Token($user->getRoles());
 			$authenticatedToken->setUser($user);
 
 			return $authenticatedToken;
 		}
 
-		throw new AuthenticationException('The WSSE authentication failed.');
+		throw new AuthenticationException('WSSE authentication failed.');
 	}
 
 	protected function validateDigest($digest, $nonce, $created, $secret)
@@ -58,6 +58,6 @@ class Provider implements AuthenticationProviderInterface
 
 	public function supports(TokenInterface $token)
 	{
-		return $token instanceof UserToken;
+		return $token instanceof Token;
 	}
 }

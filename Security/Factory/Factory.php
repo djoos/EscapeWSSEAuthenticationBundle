@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 
-class WSSEFactory implements SecurityFactoryInterface
+class Factory implements SecurityFactoryInterface
 {
 	public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
 	{
