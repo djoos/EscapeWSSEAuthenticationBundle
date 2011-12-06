@@ -41,11 +41,14 @@ escape_wsse_authentication:
 
 app/config/security.yml
 
+nonce_dir: location where nonces will be saved (use null to skip nonce-validation)
+lifetime: lifetime of nonce
+
 ```
 firewalls:
     wsse_secured:
         pattern:   ^/api/.*
-        wsse:      true
+        wsse:      { nonce_dir: null, lifetime: 300 } 
 
 factories:
     - "%kernel.root_dir%/../vendor/bundles/Escape/WSSEAuthenticationBundle/Resources/config/security_factories.yml"
