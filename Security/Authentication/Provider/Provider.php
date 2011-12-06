@@ -16,7 +16,7 @@ class Provider implements AuthenticationProviderInterface
 	private $nonceDir;
 	private $lifetime;
 
-	public function __construct(UserProviderInterface $userProvider, $nonceDir=null, $lifetime=null)
+	public function __construct(UserProviderInterface $userProvider, $nonceDir=null, $lifetime=300)
 	{
 		$this->userProvider = $userProvider;
 		$this->nonceDir = $nonceDir;
