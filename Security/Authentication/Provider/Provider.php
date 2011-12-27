@@ -31,6 +31,7 @@ class Provider implements AuthenticationProviderInterface
 		{
 			$authenticatedToken = new Token($user->getRoles());
 			$authenticatedToken->setUser($user);
+            $authenticatedToken->setAuthenticated(true);
 
 			return $authenticatedToken;
 		}
