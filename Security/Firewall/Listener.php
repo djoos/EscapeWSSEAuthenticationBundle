@@ -12,10 +12,13 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+use UnexpectedValueException;
+
 class Listener implements ListenerInterface
 {
 	protected $securityContext;
 	protected $authenticationManager;
+    private $wsseHeader;
 
 	public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager)
 	{
@@ -23,21 +26,59 @@ class Listener implements ListenerInterface
 		$this->authenticationManager = $authenticationManager;
 	}
 
+    /**
+     * The method returns value of a bit header by the key
+     *
+     * @param $key
+     * @return mixed
+     * @throws \UnexpectedValueException
+     */
+    private function parseValue($key)
+    {
+        if(!preg_match('/' . $key . '="([^"]+)"/', $this->wsseHeader, $matches)) {
+            throw new UnexpectedValueException('The string was not found');
+        }
+
+        return $matches[1];
+    }
+
+    /**
+     * The method parses X-WSSE header. If Username, PasswordDigest, Nonce and Created are exists then it returns value of them.
+     * Otherwise the method returns false.
+     *
+     * @return array|bool
+     */
+    private function parseHeader()
+    {
+        $result = array();
+        try {
+            $result['Username'] = $this->parseValue('Username');
+            $result['PasswordDigest'] = $this->parseValue('PasswordDigest');
+            $result['Nonce'] = $this->parseValue('Nonce');
+            $result['Created'] = $this->parseValue('Created');
+        } catch (UnexpectedValueException $e) {
+            return false;
+        }
+
+        return $result;
+    }
+
 	public function handle(GetResponseEvent $event)
 	{
 		$request = $event->getRequest();
 
 		if($request->headers->has('X-WSSE'))
 		{
-			$wsseRegex = '/UsernameToken Username="([^"]+)", PasswordDigest="([^"]+)", Nonce="([^"]+)", Created="([^"]+)"/';
+            $this->wsseHeader = $request->headers->get('X-WSSE');
+            $wsseHeaderInfo = $this->parseHeader();
 
-			if(preg_match($wsseRegex, $request->headers->get('X-WSSE'), $matches))
+			if($wsseHeaderInfo !== false)
 			{
 				$token = new Token();
-				$token->setUser($matches[1]);
-				$token->digest = $matches[2];
-				$token->nonce = $matches[3];
-				$token->created = $matches[4];
+				$token->setUser($wsseHeaderInfo['Username']);
+				$token->digest = $wsseHeaderInfo['PasswordDigest'];
+				$token->nonce = $wsseHeaderInfo['Nonce'];
+				$token->created = $wsseHeaderInfo['Created'];
 
 				try
 				{
