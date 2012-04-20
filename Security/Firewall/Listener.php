@@ -73,7 +73,7 @@ class Listener implements ListenerInterface
         // if it is a preflight request we should answer that we're able to accest X-WSSE headers
         if ($request->getMethod() == 'OPTIONS') {
             $response->setStatusCode(200);
-            $response->headers->set('Access-Control-Allow-Origin',$this->allowedClients);
+            $response->headers->set('Access-Control-Allow-Origin', $request->headers->get('Origin'));
             $response->headers->set('Access-Control-Allow-Headers', 'X-WSSE');
 
             return $event->setResponse($response);
