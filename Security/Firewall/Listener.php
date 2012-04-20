@@ -18,13 +18,15 @@ class Listener implements ListenerInterface
 {
 	protected $securityContext;
 	protected $authenticationManager;
+    protected $allowedClients;
     private $wsseHeader;
 
-	public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager)
-	{
-		$this->securityContext = $securityContext;
-		$this->authenticationManager = $authenticationManager;
-	}
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $allowedClients)
+    {
+        $this->securityContext = $securityContext;
+        $this->authenticationManager = $authenticationManager;
+        $this->allowedClients = $allowedClients;
+    }
 
     /**
      * The method returns value of a bit header by the key
@@ -63,49 +65,50 @@ class Listener implements ListenerInterface
         return $result;
     }
 
-	public function handle(GetResponseEvent $event)
-	{
-		$request = $event->getRequest();
+    public function handle(GetResponseEvent $event)
+    {
+        $request = $event->getRequest();
+        $response = new Response();
 
-		if($request->headers->has('X-WSSE'))
-		{
-            $this->wsseHeader = $request->headers->get('X-WSSE');
-            $wsseHeaderInfo = $this->parseHeader();
+        // if it is a preflight request we should answer that we're able to accest X-WSSE headers
+        if ($request->getMethod() == 'OPTIONS') {
+            $response->setStatusCode(200);
+            $response->headers->set('Access-Control-Allow-Origin', $request->headers->get('Origin'));
+            $response->headers->set('Access-Control-Allow-Headers', 'X-WSSE');
 
-			if($wsseHeaderInfo !== false)
-			{
-				$token = new Token();
-				$token->setUser($wsseHeaderInfo['Username']);
-				$token->digest = $wsseHeaderInfo['PasswordDigest'];
-				$token->nonce = $wsseHeaderInfo['Nonce'];
-				$token->created = $wsseHeaderInfo['Created'];
+            return $event->setResponse($response);
+        } else {
+            if ($request->headers->has('X-WSSE')) {
+                $this->wsseHeader = $request->headers->get('X-WSSE');
+                $wsseHeaderInfo = $this->parseHeader();
 
-				try
-				{
-					$returnValue = $this->authenticationManager->authenticate($token);
+                if ($wsseHeaderInfo !== false) {
+                    $token = new Token();
+                    $token->setUser($wsseHeaderInfo['Username']);
+                    $token->digest = $wsseHeaderInfo['PasswordDigest'];
+                    $token->nonce = $wsseHeaderInfo['Nonce'];
+                    $token->created = $wsseHeaderInfo['Created'];
 
-					if($returnValue instanceof TokenInterface)
-						return $this->securityContext->setToken($returnValue);
-					else if($returnValue instanceof Response)
-						return $event->setResponse($returnValue);
-				}
-				catch(AuthenticationException $e)
-				{
-					//you might want to log something here
-				}
-			}
+                    try {
+                        $returnValue = $this->authenticationManager->authenticate($token);
 
-			$response = new Response();
-			$response->setStatusCode(403);//forbidden
-			$event->setResponse($response);
-		}
-		else
-		{
-			$response = new Response();
-			$response->setStatusCode(401);//unauthorized
-			$event->setResponse($response);
+                        if ($returnValue instanceof TokenInterface) {
+                            return $this->securityContext->setToken($returnValue);
+                        } elseif($returnValue instanceof Response) {
+                            return $event->setResponse($returnValue);
+                        }
+                    } catch(AuthenticationException $e) {
+                        //you might want to log something here
+                    }
+                }
 
-			return;
-		}
-	}
+                $response->setStatusCode(403);//forbidden
+                $event->setResponse($response);
+            } else {
+                $response->setStatusCode(401);//unauthorized
+
+                return $event->setResponse($response);
+            }
+        }
+    }
 }

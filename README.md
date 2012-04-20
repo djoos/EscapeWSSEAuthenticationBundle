@@ -35,6 +35,7 @@ escape_wsse_authentication:
     provider_class: Escape\WSSEAuthenticationBundle\Security\Authentication\Provider\Provider
     listener_class: Escape\WSSEAuthenticationBundle\Security\Firewall\Listener
     factory_class: Escape\WSSEAuthenticationBundle\Security\Factory\WSSEFactory
+    allowed_clients: ["http://example.com", "http://test.com"]
 ```
 
 ## Usage example
