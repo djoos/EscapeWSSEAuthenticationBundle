@@ -5,4 +5,4 @@ services:
 
     wsse.security.authentication.listener:
         class:  %wsse.authentication.listener.class%
-        arguments: [@security.context, @security.authentication.manager]
+        arguments: [@security.context, @security.authentication.manager, %wsse.authentication.allowed_clients%]
