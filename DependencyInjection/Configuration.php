@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
     		    ->scalarNode('provider_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Authentication\Provider\Provider')->end()
         		->scalarNode('listener_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Firewall\Listener')->end()
         		->scalarNode('factory_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Factory\WSSEFactory')->end()
-        		->scalarNode('allowed_clients')->defaultValue(array('*'))->prototype('scalar')->end()
+        		->arrayNode('allowed_clients')->defaultValue(array('*'))->prototype('scalar')->end()
         	->end()
         ;
 
