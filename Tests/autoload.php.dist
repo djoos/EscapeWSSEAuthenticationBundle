@@ -6,16 +6,24 @@ require_once $vendorDir.'/symfony/src/Symfony/Component/ClassLoader/UniversalCla
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 $loader = new UniversalClassLoader();
-$loader->registerNamespaces(array(
+
+$loader->registerNamespaces(
+	array(
     'Symfony'   => $vendorDir.'/symfony/src',
-));
+	)
+);
+
 $loader->register();
 
-spl_autoload_register(function($class) {
+spl_autoload_register(function($class)
+{
     $class = ltrim($class, '\\');
-    if (0 === strpos($class, 'Escape\WSSEAuthenticationBundle\\')) {
+
+    if(0 === strpos($class, 'Escape\WSSEAuthenticationBundle\\'))
+    {
         $file = __DIR__.'/../'.str_replace('\\', '/', substr($class, strlen('Escape\WSSEAuthenticationBundle\\'))).'.php';
-        if (file_exists($file)) {
+        if(file_exists($file))
+        {
             require $file;
         }
     }

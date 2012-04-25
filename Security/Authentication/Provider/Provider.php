@@ -43,13 +43,17 @@ class Provider implements AuthenticationProviderInterface
 	{
 		//expire timestamp after specified lifetime
 		if(time() - strtotime($created) > $this->lifetime)
+		{
 			return false;
+		}
 
 		if($this->nonceDir)
 		{
 			//validate nonce is unique within specified lifetime
 			if(file_exists($this->nonceDir.'/'.$nonce) && file_get_contents($this->nonceDir.'/'.$nonce) + $this->lifetime < time())
+			{
 				throw new NonceExpiredException('Previously used nonce detected');
+			}
 
 			file_put_contents($this->nonceDir.'/'.$nonce, time());
 		}

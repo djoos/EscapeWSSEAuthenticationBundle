@@ -8,13 +8,16 @@ $deps = array(
     array('symfony', 'http://github.com/symfony/symfony', isset($_SERVER['SYMFONY_VERSION']) ? $_SERVER['SYMFONY_VERSION'] : 'origin/master'),
 );
 
-foreach ($deps as $dep) {
+foreach($deps as $dep)
+{
     list($name, $url, $rev) = $dep;
 
     echo "> Installing/Updating $name\n";
 
     $installDir = $vendorDir.'/'.$name;
-    if (!is_dir($installDir)) {
+    
+    if(!is_dir($installDir))
+    {
         system(sprintf('git clone -q %s %s', escapeshellarg($url), escapeshellarg($installDir)));
     }
 

@@ -35,7 +35,8 @@ class Listener implements ListenerInterface
      */
     private function parseValue($key)
     {
-        if(!preg_match('/' . $key . '="([^"]+)"/', $this->wsseHeader, $matches)) {
+        if(!preg_match('/'.$key.'="([^"]+)"/', $this->wsseHeader, $matches))
+        {
             throw new UnexpectedValueException('The string was not found');
         }
 
@@ -51,12 +52,16 @@ class Listener implements ListenerInterface
     private function parseHeader()
     {
         $result = array();
-        try {
+
+        try
+        {
             $result['Username'] = $this->parseValue('Username');
             $result['PasswordDigest'] = $this->parseValue('PasswordDigest');
             $result['Nonce'] = $this->parseValue('Nonce');
             $result['Created'] = $this->parseValue('Created');
-        } catch (UnexpectedValueException $e) {
+        }
+        catch(UnexpectedValueException $e)
+        {
             return false;
         }
 
@@ -85,9 +90,13 @@ class Listener implements ListenerInterface
 					$returnValue = $this->authenticationManager->authenticate($token);
 
 					if($returnValue instanceof TokenInterface)
+					{
 						return $this->securityContext->setToken($returnValue);
+					}
 					else if($returnValue instanceof Response)
+					{
 						return $event->setResponse($returnValue);
+					}
 				}
 				catch(AuthenticationException $e)
 				{
