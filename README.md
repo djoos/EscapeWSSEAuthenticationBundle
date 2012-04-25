@@ -1,6 +1,6 @@
 ## Introduction
 
-The EscapeRackspaceCloudFiles bundle is a simple and easy way to use the namespaced version of php-cloudfiles with Symfony2 applications
+The EscapeWSSEAuthentication bundle is a simple and easy way to implement WSSE authentication into Symfony2 applications
 
 ## Installation
 
