@@ -1,5 +1,5 @@
 {
-    "name": "escape/wsse-authentication-bundle",
+    "name": "mopa/wsse-authentication-bundle",
     "type": "symfony-bundle",
     "description": "a simple and easy way to implement WSSE authentication into Symfony2 applications",
     "keywords": ["wsse", "symfony2", "authentication"],
