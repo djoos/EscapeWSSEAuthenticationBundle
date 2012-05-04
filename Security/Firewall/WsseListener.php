@@ -83,7 +83,7 @@ class WsseListener implements ListenerInterface
                 $token->digest   = $matches[2];
                 $token->nonce    = $matches[3];
                 $token->created  = $matches[4];
-				var_dump($token);exit;
+
                 try {
                     $returnValue = $this->authenticationManager->authenticate($token);
                     if ($returnValue instanceof TokenInterface) {
