@@ -14,9 +14,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
 	        ->children()
-    		    ->scalarNode('provider_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Authentication\Provider\Provider')->end()
-        		->scalarNode('listener_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Firewall\Listener')->end()
-        		->scalarNode('factory_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Factory\WSSEFactory')->end()
+    		    ->scalarNode('provider_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Authentication\Provider\WsseAuthenticationProvider')->end()
+        		->scalarNode('listener_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Firewall\WsseListener')->end()
+        		->scalarNode('factory_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Factory\WsseFactory')->end()
         	->end()
         ;
 

@@ -1,0 +1,25 @@
+{
+    "name": "mopa/wsse-authentication-bundle",
+    "type": "symfony-bundle",
+    "description": "a simple and easy way to implement WSSE authentication into Symfony2 applications",
+    "keywords": ["wsse", "symfony2", "authentication"],
+    "authors": [
+        {
+            "name": "David Joos",
+            "homepage": "http://www.escapestudios.co.uk/"
+        },
+        {
+            "name": "Community contributions",
+            "homepage": "https://github.com/escapestudios/EscapeWSSEAuthenticationBundle/contributors"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Escape\\WSSEAuthenticationBundle": ""
+        }
+    },
+    "target-dir": "Escape/WSSEAuthenticationBundle",
+    "require": {
+        "php": ">=5.3.2"
+    }
+}

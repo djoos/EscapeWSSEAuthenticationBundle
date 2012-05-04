@@ -2,7 +2,6 @@
 
 namespace Escape\WSSEAuthenticationBundle\Security\Firewall;
 
-use Escape\WSSEAuthenticationBundle\Security\Authentication\Token\Token;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -11,10 +10,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
+use Escape\WSSEAuthenticationBundle\Security\Authentication\Token\WsseToken;
 use UnexpectedValueException;
 
-class Listener implements ListenerInterface
+class WsseListener implements ListenerInterface
 {
 	protected $securityContext;
 	protected $authenticationManager;
@@ -72,49 +71,37 @@ class Listener implements ListenerInterface
 	{
 		$request = $event->getRequest();
 
-		if($request->headers->has('X-WSSE'))
-		{
-            $this->wsseHeader = $request->headers->get('X-WSSE');
-            $wsseHeaderInfo = $this->parseHeader();
+        if ($request->headers->has('x-wsse')) {
 
-			if($wsseHeaderInfo !== false)
-			{
-				$token = new Token();
-				$token->setUser($wsseHeaderInfo['Username']);
-				$token->digest = $wsseHeaderInfo['PasswordDigest'];
-				$token->nonce = $wsseHeaderInfo['Nonce'];
-				$token->created = $wsseHeaderInfo['Created'];
+            $wsseRegex = '/UsernameToken Username="([^"]+)", PasswordDigest="([^"]+)", Nonce="([^"]+)", Created="([^"]+)"/';
 
-				try
-				{
-					$returnValue = $this->authenticationManager->authenticate($token);
+            if (preg_match($wsseRegex, $request->headers->get('x-wsse'), $matches)) {
 
-					if($returnValue instanceof TokenInterface)
-					{
-						return $this->securityContext->setToken($returnValue);
-					}
-					else if($returnValue instanceof Response)
-					{
-						return $event->setResponse($returnValue);
-					}
-				}
-				catch(AuthenticationException $e)
-				{
-					//you might want to log something here
-				}
-			}
+                $token = new WsseToken();
+                $token->setUser($matches[1]);
 
-			$response = new Response();
-			$response->setStatusCode(403);//forbidden
-			$event->setResponse($response);
-		}
-		else
-		{
-			$response = new Response();
-			$response->setStatusCode(401);//unauthorized
-			$event->setResponse($response);
+                $token->digest   = $matches[2];
+                $token->nonce    = $matches[3];
+                $token->created  = $matches[4];
 
-			return;
-		}
+                try {
+                    $returnValue = $this->authenticationManager->authenticate($token);
+                    if ($returnValue instanceof TokenInterface) {
+                        return $this->securityContext->setToken($returnValue);
+                    } else if ($returnValue instanceof Response) {
+                        return $event->setResponse($returnValue);
+                    }
+                } catch (AuthenticationException $authException) {
+			        $response = new Response();
+			        $response->setStatusCode(401, $authException ? $authException->getMessage() : null);
+        			$event->setResponse($response);
+        			return;
+                }
+            }
+        }
+
+        $response = new Response();
+        $response->setStatusCode(403);
+        $event->setResponse($response);
 	}
 }
