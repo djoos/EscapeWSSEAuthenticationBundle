@@ -4,7 +4,7 @@ namespace Escape\WSSEAuthenticationBundle\Security\Authentication\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
-class Token extends AbstractToken
+class WsseToken extends AbstractToken
 {
 	public $created;
 	public $digest;

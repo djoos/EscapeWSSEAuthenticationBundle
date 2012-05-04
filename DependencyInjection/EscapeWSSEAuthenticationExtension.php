@@ -4,7 +4,7 @@ namespace Escape\WSSEAuthenticationBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Config\FileLocator;
 
 class EscapeWSSEAuthenticationExtension extends Extension
@@ -14,11 +14,10 @@ class EscapeWSSEAuthenticationExtension extends Extension
 		$configuration = new Configuration();
 		$config = $this->processConfiguration($configuration, $configs);
 
-		$loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-		$loader->load('services.yml');
+		$loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+		$loader->load('security.xml');
 
-		$container->setParameter('wsse.authentication.provider.class', $config['provider_class']);
-		$container->setParameter('wsse.authentication.listener.class', $config['listener_class']);
-		$container->setParameter('wsse.authentication.factory.class', $config['factory_class']);
+		$container->setParameter('escape_wsse.authentication.provider.class', $config['provider_class']);
+		$container->setParameter('escape_wsse.authentication.listener.class', $config['listener_class']);
 	}
 }
