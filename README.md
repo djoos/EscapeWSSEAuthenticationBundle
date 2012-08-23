@@ -34,7 +34,7 @@ app/config/config.yml
 escape_wsse_authentication:
     provider_class: Escape\WSSEAuthenticationBundle\Security\Authentication\Provider\Provider
     listener_class: Escape\WSSEAuthenticationBundle\Security\Firewall\Listener
-    factory_class: Escape\WSSEAuthenticationBundle\Security\Factory\WSSEFactory
+    factory_class: Escape\WSSEAuthenticationBundle\Security\Factory\Factory
 ```
 
 ## Usage example
