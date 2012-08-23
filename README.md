@@ -30,7 +30,7 @@ public function registerBundles()
 app/config/config.yml
 
 ```
-# Escape Rackspace Cloud Files configuration
+# Escape WSSE authentication configuration
 escape_wsse_authentication:
     provider_class: Escape\WSSEAuthenticationBundle\Security\Authentication\Provider\Provider
     listener_class: Escape\WSSEAuthenticationBundle\Security\Firewall\Listener
