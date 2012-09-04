@@ -32,9 +32,8 @@ app/config/config.yml
 ```
 # Escape Rackspace Cloud Files configuration
 escape_wsse_authentication:
-    provider_class: Escape\WSSEAuthenticationBundle\Security\Authentication\Provider\Provider
-    listener_class: Escape\WSSEAuthenticationBundle\Security\Firewall\Listener
-    factory_class: Escape\WSSEAuthenticationBundle\Security\Factory\WSSEFactory
+    provider_class: Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider
+    listener_class: Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener
 ```
 
 ## Usage example
@@ -53,3 +52,8 @@ firewalls:
 factories:
     - "%kernel.root_dir%/../vendor/bundles/Escape/WSSEAuthenticationBundle/Resources/config/security_factories.yml"
 ```
+
+## Changelog
+
+### Refactoring
+    * Change in directory structure, similar to structure of Symfony2 core authentication methods

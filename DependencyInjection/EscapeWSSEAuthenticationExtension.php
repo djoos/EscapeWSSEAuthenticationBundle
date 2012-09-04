@@ -17,8 +17,7 @@ class EscapeWSSEAuthenticationExtension extends Extension
 		$loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 		$loader->load('services.yml');
 
-		$container->setParameter('wsse.authentication.provider.class', $config['provider_class']);
-		$container->setParameter('wsse.authentication.listener.class', $config['listener_class']);
-		$container->setParameter('wsse.authentication.factory.class', $config['factory_class']);
+		$container->setParameter('authentication.provider.wsse.class', $config['authentication_provider_class']);
+		$container->setParameter('authentication.listener.wsse.class', $config['authentication_listener_class']);
 	}
 }
