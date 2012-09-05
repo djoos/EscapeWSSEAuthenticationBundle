@@ -1,8 +1,8 @@
+[![Build Status](https://secure.travis-ci.org/escapestudios/EscapeWSSEAuthenticationBundle.png)](http://travis-ci.org/escapestudios/EscapeWSSEAuthenticationBundle)
+
 ## Introduction
 
 The EscapeWSSEAuthentication bundle is a simple and easy way to implement WSSE authentication into Symfony2 applications
-
-[![Build Status](https://secure.travis-ci.org/escapestudios/EscapeWSSEAuthenticationBundle.png)](http://travis-ci.org/escapestudios/EscapeWSSEAuthenticationBundle)
 
 ## Installation
 
