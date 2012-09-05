@@ -1,29 +1,10 @@
 <?php
 
-require_once $_SERVER['SYMFONY'].'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+$file = __DIR__.'/../vendor/autoload.php';
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
-
-$loader = new UniversalClassLoader();
-$loader->registerNamespaces(
-    array(
-        'Symfony' => $_SERVER['SYMFONY'].'/src',
-    )
-);
-
-$loader->register();
-
-spl_autoload_register(function($class)
+if(!file_exists($file))
 {
-    $class = ltrim($class, '\\');
+    throw new RuntimeException('Install dependencies to run test suite. "php composer.phar install --dev"');
+}
 
-    if(0 === strpos($class, 'Escape\WSSEAuthenticationBundle\\'))
-    {
-        $file = __DIR__.'/../'.str_replace('\\', '/', substr($class, strlen('Escape\WSSEAuthenticationBundle\\'))).'.php';
-
-        if(file_exists($file))
-        {
-            require $file;
-        }
-    }
-});
+require_once $file;
