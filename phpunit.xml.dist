@@ -11,6 +11,10 @@
          syntaxCheck="false"
          bootstrap="Tests/bootstrap.php"
 >
+    <php>
+        <server name="SYMFONY" value="/please/specify/path/to/Symfony2/in/a/custom/phpunit.xml/file" />
+    </php>
+
     <testsuites>
         <testsuite name="EscapeWSSEAuthenticationBundle Test Suite">
             <directory suffix="Test.php">./Tests</directory>

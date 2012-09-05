@@ -55,5 +55,27 @@ factories:
 
 ## Changelog
 
-### Refactoring
-    * Change in directory structure, similar to structure of Symfony2 core authentication methods
+### 09/2012
+    * Refactoring: changes to directory structure, replicating Symfony2 core authentication methods.
+
+### 08/2012
+    * WSSEFactory -> Factory
+    * Fix wrong README reference
+    * There's no WSSEFactory - use Factory instead
+
+### 04/2012
+    * README-fix
+    * making the formatting consistent
+
+### 02/2012
+    * Refactoring. Improved method of parsing the header.
+
+### 12/2011
+    * Fixed fatal error. Commit unit tests
+    * AbstractToken set to a $authenticated flag is false. It must be set true after authentication for successful authorization. This is done for all other symfony tokens.
+    * It makes no sense to encode in base64 time and security by following the standards WSSE
+    * initial version
+
+## Contributors
+    * Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
+    * David Joos <david@escapestudios.com>

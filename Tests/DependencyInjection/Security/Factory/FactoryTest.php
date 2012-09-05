@@ -1,16 +1,12 @@
 <?php
-/**
- * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
- */
-namespace Escape\WSSEAuthenticationBundle\Tests\Security\Factory;
 
-use Escape\WSSEAuthenticationBundle\Security\Factory\Factory;
+namespace Escape\WSSEAuthenticationBundle\Tests\DependencyInjection\Security\Factory;
+
+use Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory\Factory;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
- * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
- */
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -36,7 +32,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function getFactory()
     {
-        return $this->getMockForAbstractClass('Escape\WSSEAuthenticationBundle\Security\Factory\Factory', array());
+        return $this->getMockForAbstractClass('Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory\Factory', array());
     }
 
     public function testCreate()

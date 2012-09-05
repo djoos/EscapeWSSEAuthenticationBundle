@@ -1,10 +1,11 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\Tests\Security\Firewall;
+namespace Escape\WSSEAuthenticationBundle\Tests\Security\Http\Firewall;
 
-use Escape\WSSEAuthenticationBundle\Security\Firewall\Listener;
+use Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener;
+use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+
 use Symfony\Component\HttpFoundation\Response;
-use Escape\WSSEAuthenticationBundle\Security\Authentication\Token\Token;
 
 class ListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -69,9 +70,9 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
     {
         $token = new Token();
         $token->setUser('admin');
-        $token->digest = 'admin';
-        $token->nonce = 'admin';
-        $token->created = '2010-12-12 20:00:00';
+        $token->setAttribute('digest','admin');
+        $token->setAttribute('nonce','admin');
+        $token->setAttribute('created','2010-12-12 20:00:00');
         $tokenMock2 = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($tokenMock2));
         $this->securityContext->expects($this->once())->method('setToken')->with($tokenMock2);
@@ -87,9 +88,9 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
     {
         $token = new Token();
         $token->setUser('admin');
-        $token->digest = 'admin';
-        $token->nonce = 'admin';
-        $token->created = '2010-12-12 20:00:00';
+        $token->setAttribute('digest','admin');
+        $token->setAttribute('nonce','admin');
+        $token->setAttribute('created','2010-12-12 20:00:00');
         $response = new Response();
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($response));
         $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
@@ -97,5 +98,4 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new Listener($this->securityContext, $this->authenticationManager);
         $listener->handle($this->responseEvent);
     }
-
 }
