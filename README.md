@@ -54,7 +54,3 @@ firewalls:
 factories:
     - "%kernel.root_dir%/../vendor/bundles/Escape/WSSEAuthenticationBundle/Resources/config/security_factories.yml"
 ```
-
-## Contributors
-    * Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
-    * David Joos <david@escapestudios.com>
