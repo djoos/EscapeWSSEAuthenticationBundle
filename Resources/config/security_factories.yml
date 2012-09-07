@@ -1,8 +1,0 @@
-parameters:
-    authentication.factory.wsse.class: Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory\Factory
-
-services:
-    security.authentication.factory.wsse:
-        class:  %authentication.factory.wsse.class%
-        tags:
-            - { name: security.listener.factory }

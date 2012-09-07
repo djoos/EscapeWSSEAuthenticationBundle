@@ -50,7 +50,4 @@ firewalls:
     wsse_secured:
         pattern:   ^/api/.*
         wsse:      { nonce_dir: null, lifetime: 300 } 
-
-factories:
-    - "%kernel.root_dir%/../vendor/bundles/Escape/WSSEAuthenticationBundle/Resources/config/security_factories.yml"
 ```
