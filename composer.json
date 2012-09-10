@@ -1,5 +1,5 @@
 {
-    "name": "escape/wsse-authentication-bundle",
+    "name": "escapestudios/wsse-authentication-bundle",
     "type": "symfony-bundle",
     "description": "Symfony2 bundle to implement WSSE authentication",
     "keywords": ["wsse", "authentication", "bundle"],
