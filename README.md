@@ -33,7 +33,7 @@ app/config/config.yml
 
 ```
 # Escape WSSE authentication configuration
-escape_wsse_authentication:
+mopa_wsse_authentication:
     provider_class: Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider
     listener_class: Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener
 ```
