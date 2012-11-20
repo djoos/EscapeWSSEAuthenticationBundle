@@ -34,8 +34,8 @@ app/config/config.yml
 ```
 # Escape WSSE authentication configuration
 escape_wsse_authentication:
-    provider_class: Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider
-    listener_class: Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener
+    authentication_provider_class: Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider
+    authentication_listener_class: Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener
 ```
 
 ## Usage example
