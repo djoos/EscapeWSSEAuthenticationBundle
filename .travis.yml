@@ -10,6 +10,7 @@ env:
 before_script:
     - curl -s http://getcomposer.org/installer | php
     - php composer.phar install --dev
+    - mkdir -p "Tests/nonceDir"
 
 notifications:
   email:
