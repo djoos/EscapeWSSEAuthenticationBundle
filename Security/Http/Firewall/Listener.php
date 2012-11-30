@@ -74,6 +74,7 @@ class Listener implements ListenerInterface
 
 		if($request->headers->has('X-WSSE'))
 		{
+            $ae_message = null;
             $this->wsseHeader = $request->headers->get('X-WSSE');
             $wsseHeaderInfo = $this->parseHeader();
 
@@ -99,14 +100,20 @@ class Listener implements ListenerInterface
 						return $event->setResponse($returnValue);
 					}
 				}
-				catch(AuthenticationException $e)
+				catch(AuthenticationException $ae)
 				{
-					//you might want to log something here
+                    $ae_message = $ae->getMessage();
 				}
 			}
 
 			$response = new Response();
 			$response->setStatusCode(403);//forbidden
+
+            if($ae_message)
+            {
+                $response->setContent($ae_message);
+            }
+
 			$event->setResponse($response);
 		}
 		else

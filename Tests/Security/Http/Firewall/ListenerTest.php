@@ -58,7 +58,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new Listener($this->securityContext, $this->authenticationManager);
         $this->request->headers->add(array('X-WSSE'=>'temp'));
         $response = new Response();
-        $response->setStatusCode(403);//unauthorized
+        $response->setStatusCode(403);//forbidden
         $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
         $result = $listener->handle($this->responseEvent);
     }

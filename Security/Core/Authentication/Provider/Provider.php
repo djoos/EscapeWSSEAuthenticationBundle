@@ -7,6 +7,7 @@ use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -44,7 +45,7 @@ class Provider implements AuthenticationProviderInterface
 		//expire timestamp after specified lifetime
 		if(time() - strtotime($created) > $this->lifetime)
 		{
-			return false;
+            throw new CredentialsExpiredException('Token has expired.');
 		}
 
 		if($this->nonceDir)
@@ -52,7 +53,7 @@ class Provider implements AuthenticationProviderInterface
 			//validate nonce is unique within specified lifetime
 			if(file_exists($this->nonceDir.'/'.$nonce) && file_get_contents($this->nonceDir.'/'.$nonce) + $this->lifetime < time())
 			{
-				throw new NonceExpiredException('Previously used nonce detected');
+				throw new NonceExpiredException('Previously used nonce detected.');
 			}
 
 			file_put_contents($this->nonceDir.'/'.$nonce, time());

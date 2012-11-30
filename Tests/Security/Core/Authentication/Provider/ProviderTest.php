@@ -87,7 +87,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     *
+     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
      * @param $digest
      * @param $nonce
      * @param $created
@@ -96,8 +96,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     public function validateDigestExpireTime()
     {
         $provider = new ProviderTestSimple($this->userProvider);
-        $result = $provider->validateDigest(null, null, '2000-10-10 12:00:00', null);
-        $this->assertFalse($result);
+        $provider->validateDigest(null, null, date('r', (time() - 86400)), null);
     }
 
     /**
@@ -183,7 +182,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     public function validateDigestWithNonceDirExpectedException($digest, $nonce, $created, $secret, $expected)
     {
         $provider = new ProviderTestSimple($this->userProvider, self::$nonceDir);
-        file_put_contents(self::$nonceDir.$nonce, time() - 60000);
+        file_put_contents(self::$nonceDir.$nonce, (time() - 86400));
 
         $provider->validateDigest($digest, $nonce, $created, $secret);
 
