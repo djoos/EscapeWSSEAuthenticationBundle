@@ -15,6 +15,11 @@
             "homepage": "https://github.com/escapestudios/EscapeWSSEAuthenticationBundle/graphs/contributors"
         }
     ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.2.x-dev"
+        }
+    },
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.2"
