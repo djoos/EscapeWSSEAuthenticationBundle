@@ -12,6 +12,10 @@ before_script:
     - php composer.phar install --dev
     - mkdir -p "Tests/nonceDir"
 
+branches:
+  except:
+    - 2.0.x
+
 notifications:
   email:
     - dev@escapestudios.com
