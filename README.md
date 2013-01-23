@@ -6,13 +6,14 @@ The EscapeWSSEAuthentication bundle is a simple and easy way to implement WSSE a
 
 ## Installation
 
-app/autoload.php
+composer.json
 
 ```
-$loader->registerNamespaces(array(
-    //other namespaces
-    'Escape' => __DIR__.'/../vendor/bundles',
-  ));
+"require": {
+    ...
+    "escapestudios/wsse-authentication-bundle": "2.2.x-dev",
+    ...
+}
 ```
 
 app/AppKernel.php
@@ -21,8 +22,9 @@ app/AppKernel.php
 public function registerBundles()
 {
     return array(
-        //other bundles
+        //...
         new Escape\WSSEAuthenticationBundle\EscapeWSSEAuthenticationBundle(),
+        //...
     );
     ...
 ```
