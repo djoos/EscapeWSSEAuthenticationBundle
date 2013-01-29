@@ -45,15 +45,20 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         list($authProviderId,
              $listenerId,
              $entryPointId
-        ) = $factory->create($container, 'foo', array('nonce_dir' => 'nonce', 'lifetime' => 300), 'user_provider', 'entry_point');
+        ) = $factory->create($container, 'foo', array('nonce_dir' => 'nonce', 'lifetime' => 300, 'realm' => 'foo', 'profile' => 'UsernameToken'), 'user_provider', 'entry_point');
 
         // auth provider
         $this->assertEquals('security.authentication.provider.wsse.foo', $authProviderId);
         $this->assertEquals('security.authentication.listener.wsse.foo', $listenerId);
         $this->assertEquals('entry_point', $entryPointId);
         $this->assertTrue($container->hasDefinition('security.authentication.listener.wsse.foo'));
-        $definition = $container->getDefinition('security.authentication.provider.wsse.foo');
-        $this->assertEquals(array('index_0' => new Reference('user_provider'), 'index_1' => 'nonce', 'index_2' => 300), $definition->getArguments());
+        $providerDefinition = $container->getDefinition('security.authentication.provider.wsse.foo');
+        $this->assertEquals(array('index_0' => new Reference('user_provider'), 'index_1' => 'nonce', 'index_2' => 300), $providerDefinition->getArguments());
         $this->assertTrue($container->hasDefinition('security.authentication.provider.wsse.foo'));
+
+        $listenerDefinition = $container->getDefinition('security.authentication.listener.wsse.foo');
+        $this->assertEquals(array('index_2' => "foo",'index_3' => "UsernameToken"), $listenerDefinition->getArguments());
+        $this->assertTrue($container->hasDefinition('security.authentication.listener.wsse.foo'));
+
     }
 }
