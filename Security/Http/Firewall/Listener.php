@@ -18,60 +18,64 @@ class Listener implements ListenerInterface
 {
 	protected $securityContext;
 	protected $authenticationManager;
-    protected $realm;
-    protected $profile;
-    private $wsseHeader;
+	protected $realm;
+	protected $profile;
+	private $wsseHeader;
 
-	public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $realm, $profile)
-	{
+	public function __construct(
+		SecurityContextInterface $securityContext,
+		AuthenticationManagerInterface $authenticationManager,
+		$realm,
+		$profile
+	) {
 		$this->securityContext = $securityContext;
 		$this->authenticationManager = $authenticationManager;
-        $this->realm = $realm;
-        $this->profile = $profile;
+		$this->realm = $realm;
+		$this->profile = $profile;
 
 	}
 
-    /**
-     * The method returns value of a bit header by the key
-     *
-     * @param $key
-     * @return mixed
-     * @throws \UnexpectedValueException
-     */
-    private function parseValue($key)
-    {
-        if(!preg_match('/'.$key.'="([^"]+)"/', $this->wsseHeader, $matches))
-        {
-            throw new UnexpectedValueException('The string was not found');
-        }
+	/**
+	 * The method returns value of a bit header by the key
+	 *
+	 * @param $key
+	 * @return mixed
+	 * @throws \UnexpectedValueException
+	 */
+	private function parseValue($key)
+	{
+		if(!preg_match('/'.$key.'="([^"]+)"/', $this->wsseHeader, $matches))
+		{
+			throw new UnexpectedValueException('The string was not found');
+		}
 
-        return $matches[1];
-    }
+		return $matches[1];
+	}
 
-    /**
-     * The method parses X-WSSE header. If Username, PasswordDigest, Nonce and Created are exists then it returns value of them.
-     * Otherwise the method returns false.
-     *
-     * @return array|bool
-     */
-    private function parseHeader()
-    {
-        $result = array();
+	/**
+	 * The method parses X-WSSE header. If Username, PasswordDigest, Nonce and Created are exists then it returns value of them.
+	 * Otherwise the method returns false.
+	 *
+	 * @return array|bool
+	 */
+	private function parseHeader()
+	{
+		$result = array();
 
-        try
-        {
-            $result['Username'] = $this->parseValue('Username');
-            $result['PasswordDigest'] = $this->parseValue('PasswordDigest');
-            $result['Nonce'] = $this->parseValue('Nonce');
-            $result['Created'] = $this->parseValue('Created');
-        }
-        catch(UnexpectedValueException $e)
-        {
-            return false;
-        }
+		try
+		{
+			$result['Username'] = $this->parseValue('Username');
+			$result['PasswordDigest'] = $this->parseValue('PasswordDigest');
+			$result['Nonce'] = $this->parseValue('Nonce');
+			$result['Created'] = $this->parseValue('Created');
+		}
+		catch(UnexpectedValueException $e)
+		{
+			return false;
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
 	public function handle(GetResponseEvent $event)
 	{
@@ -79,18 +83,18 @@ class Listener implements ListenerInterface
 
 		if($request->headers->has('X-WSSE'))
 		{
-            $ae_message = null;
-            $this->wsseHeader = $request->headers->get('X-WSSE');
-            $wsseHeaderInfo = $this->parseHeader();
+			$ae_message = null;
+			$this->wsseHeader = $request->headers->get('X-WSSE');
+			$wsseHeaderInfo = $this->parseHeader();
 
 			if($wsseHeaderInfo !== false)
 			{
 				$token = new Token();
 				$token->setUser($wsseHeaderInfo['Username']);
 
-                $token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
-                $token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
-                $token->setAttribute('created', $wsseHeaderInfo['Created']);
+				$token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
+				$token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
+				$token->setAttribute('created', $wsseHeaderInfo['Created']);
 
 				try
 				{
@@ -107,17 +111,17 @@ class Listener implements ListenerInterface
 				}
 				catch(AuthenticationException $ae)
 				{
-                    $ae_message = $ae->getMessage();
+					$ae_message = $ae->getMessage();
 				}
 			}
 
 			$response = new Response();
 			$response->setStatusCode(403);//forbidden
 
-            if($ae_message)
-            {
-                $response->setContent($ae_message);
-            }
+			if($ae_message)
+			{
+				$response->setContent($ae_message);
+			}
 
 			$event->setResponse($response);
 		}
@@ -125,8 +129,8 @@ class Listener implements ListenerInterface
 		{
 			$response = new Response();
 			$response->setStatusCode(401);//unauthorized
-            $authentificationHeader =  'WSSE realm="' . $this->realm . '" profile="' . $this->profile . '"';
-            $response->headers->add(array('WWW-Authenticate' => $authentificationHeader));
+			$authenticationHeader =  'WSSE realm="' . $this->realm . '" profile="' . $this->profile . '"';
+			$response->headers->add(array('WWW-Authenticate' => $authenticationHeader));
 			$event->setResponse($response);
 
 			return;
