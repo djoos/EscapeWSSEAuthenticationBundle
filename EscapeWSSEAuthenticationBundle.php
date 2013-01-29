@@ -8,11 +8,11 @@ use Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory\Factory
 
 class EscapeWSSEAuthenticationBundle extends Bundle
 {
-      public function build(ContainerBuilder $container)
-      {
-          parent::build($container);
+	  public function build(ContainerBuilder $container)
+	  {
+		  parent::build($container);
 
-          $extension = $container->getExtension('security');
-          $extension->addSecurityListenerFactory(new Factory());
-      }
+		  $extension = $container->getExtension('security');
+		  $extension->addSecurityListenerFactory(new Factory());
+	  }
 }

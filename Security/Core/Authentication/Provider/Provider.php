@@ -32,7 +32,7 @@ class Provider implements AuthenticationProviderInterface
 		{
 			$authenticatedToken = new Token($user->getRoles());
 			$authenticatedToken->setUser($user);
-            $authenticatedToken->setAuthenticated(true);
+			$authenticatedToken->setAuthenticated(true);
 
 			return $authenticatedToken;
 		}
@@ -45,7 +45,7 @@ class Provider implements AuthenticationProviderInterface
 		//expire timestamp after specified lifetime
 		if(time() - strtotime($created) > $this->lifetime)
 		{
-            throw new CredentialsExpiredException('Token has expired.');
+			throw new CredentialsExpiredException('Token has expired.');
 		}
 
 		if($this->nonceDir)
