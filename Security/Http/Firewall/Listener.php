@@ -18,12 +18,17 @@ class Listener implements ListenerInterface
 {
 	protected $securityContext;
 	protected $authenticationManager;
+    protected $realm;
+    protected $profile;
     private $wsseHeader;
 
-	public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager)
+	public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $realm, $profile)
 	{
 		$this->securityContext = $securityContext;
 		$this->authenticationManager = $authenticationManager;
+        $this->realm = $realm;
+        $this->profile = $profile;
+
 	}
 
     /**
@@ -120,6 +125,8 @@ class Listener implements ListenerInterface
 		{
 			$response = new Response();
 			$response->setStatusCode(401);//unauthorized
+            $authentificationHeader =  'WSSE realm="' . $this->realm . '" profile="' . $this->profile . '"';
+            $response->headers->add(array('WWW-Authenticate' => $authentificationHeader));
 			$event->setResponse($response);
 
 			return;

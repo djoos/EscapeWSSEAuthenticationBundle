@@ -43,9 +43,10 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function handleUnauthorized()
     {
-        $listener = new Listener($this->securityContext, $this->authenticationManager);
+        $listener = new Listener($this->securityContext, $this->authenticationManager, 'foo', 'UsernameToken');
         $response = new Response();
         $response->setStatusCode(401);//unauthorized
+        $response->headers->add(array('WWW-Authenticate' => 'WSSE realm="foo" profile="UsernameToken"')); //realm and profile
         $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
         $result = $listener->handle($this->responseEvent);
     }
@@ -55,7 +56,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function handleForbidden()
     {
-        $listener = new Listener($this->securityContext, $this->authenticationManager);
+        $listener = new Listener($this->securityContext, $this->authenticationManager, 'foo', 'UsernameToken');
         $this->request->headers->add(array('X-WSSE'=>'temp'));
         $response = new Response();
         $response->setStatusCode(403);//forbidden
@@ -77,7 +78,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($tokenMock2));
         $this->securityContext->expects($this->once())->method('setToken')->with($tokenMock2);
         $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="admin", PasswordDigest="admin", Nonce="admin", Created="2010-12-12 20:00:00"'));
-        $listener = new Listener($this->securityContext, $this->authenticationManager);
+        $listener = new Listener($this->securityContext, $this->authenticationManager, 'foo', 'UsernameToken');
         $listener->handle($this->responseEvent);
     }
 
@@ -95,7 +96,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($response));
         $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
         $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="admin", PasswordDigest="admin", Nonce="admin", Created="2010-12-12 20:00:00"'));
-        $listener = new Listener($this->securityContext, $this->authenticationManager);
+        $listener = new Listener($this->securityContext, $this->authenticationManager, 'foo', 'UsernameToken');
         $listener->handle($this->responseEvent);
     }
 }
