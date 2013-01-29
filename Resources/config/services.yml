@@ -5,4 +5,4 @@ services:
 
     security.authentication.listener.wsse:
         class:  %authentication.listener.wsse.class%
-        arguments: [@security.context, @security.authentication.manager, foo, UsernameToken ]
+        arguments: [@security.context, @security.authentication.manager, '', '' ]
