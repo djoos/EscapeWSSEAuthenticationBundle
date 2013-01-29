@@ -1,35 +1,39 @@
 {
-    "name": "escapestudios/wsse-authentication-bundle",
-    "type": "symfony-bundle",
-    "description": "Symfony2 bundle to implement WSSE authentication",
-    "keywords": ["wsse", "authentication", "bundle"],
-    "homepage": "https://github.com/escapestudios/EscapeWSSEAuthenticationBundle",
-    "license": "MIT",
-    "authors": [
+	"name": "mayflower/wsse-authentication-bundle",
+	"type": "symfony-bundle",
+	"description": "Symfony2 bundle to implement WSSE authentication",
+	"keywords": ["wsse", "authentication", "bundle"],
+	"homepage": "https://github.com/Mayflower/MayflowerWSSEAuthenticationBundle",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "David Joos",
+			"email": "david@escapestudios.com"
+		},
         {
-            "name": "David Joos",
-            "email": "david@escapestudios.com"
+            "name": "Alberto Assmann",
+            "email": "alberto.assmann@mayflower.de"
         },
-        {
-            "name": "Community contributors",
-            "homepage": "https://github.com/escapestudios/EscapeWSSEAuthenticationBundle/graphs/contributors"
-        }
-    ],
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.2.x-dev"
-        }
-    },
-    "minimum-stability": "dev",
-    "require": {
-        "php": ">=5.3.2"
-    },
-    "require-dev": {
-        "symfony/framework-bundle": "2.2.*",
-        "symfony/security-bundle": "2.2.*"
-    },
-    "autoload": {
-        "psr-0": { "Escape\\WSSEAuthenticationBundle": "" }
-    },
-    "target-dir": "Escape/WSSEAuthenticationBundle"
+		{
+			"name": "Community contributors",
+			"homepage": "https://github.com/Mayflower/MayflowerWSSEAuthenticationBundle/graphs/contributors"
+		}
+	],
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.2.x-dev"
+		}
+	},
+	"minimum-stability": "dev",
+	"require": {
+		"php": ">=5.3.2"
+	},
+	"require-dev": {
+		"symfony/framework-bundle": "2.2.*",
+		"symfony/security-bundle": "2.2.*"
+	},
+	"autoload": {
+		"psr-0": { "Mayflower\\WSSEAuthenticationBundle": "" }
+	},
+	"target-dir": "Mayflower/WSSEAuthenticationBundle"
 }

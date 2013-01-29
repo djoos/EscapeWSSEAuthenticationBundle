@@ -1,6 +1,6 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory;
+namespace Mayflower\WSSEAuthenticationBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -20,7 +20,10 @@ class Factory implements SecurityFactoryInterface
 			->replaceArgument(2, $config['lifetime']);
 
 		$listenerId = 'security.authentication.listener.wsse.'.$id;
-		$listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.wsse'));
+		$container
+			->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.wsse'))
+			->replaceArgument(2, $config['realm'])
+			->replaceArgument(3, $config['profile']);
 
 		return array($providerId, $listenerId, $defaultEntryPoint);
 	}
@@ -41,6 +44,8 @@ class Factory implements SecurityFactoryInterface
 			->children()
 				->scalarNode('nonce_dir')->defaultValue(null)->end()
 				->scalarNode('lifetime')->defaultValue(300)->end()
+				->scalarNode('realm')->defaultValue('foo')->end()
+				->scalarNode('profile')->defaultValue('UsernameToken')->end()
 			->end()
 		;
 	}

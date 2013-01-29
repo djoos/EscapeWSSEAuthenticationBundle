@@ -1,13 +1,13 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\DependencyInjection;
+namespace Mayflower\WSSEAuthenticationBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-class EscapeWSSEAuthenticationExtension extends Extension
+class MayflowerWSSEAuthenticationExtension extends Extension
 {
 	public function load(array $configs, ContainerBuilder $container)
 	{

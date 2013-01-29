@@ -1,8 +1,8 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
+namespace Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -32,7 +32,7 @@ class Provider implements AuthenticationProviderInterface
 		{
 			$authenticatedToken = new Token($user->getRoles());
 			$authenticatedToken->setUser($user);
-            $authenticatedToken->setAuthenticated(true);
+			$authenticatedToken->setAuthenticated(true);
 
 			return $authenticatedToken;
 		}
@@ -45,7 +45,7 @@ class Provider implements AuthenticationProviderInterface
 		//expire timestamp after specified lifetime
 		if(time() - strtotime($created) > $this->lifetime)
 		{
-            throw new CredentialsExpiredException('Token has expired.');
+			throw new CredentialsExpiredException('Token has expired.');
 		}
 
 		if($this->nonceDir)
