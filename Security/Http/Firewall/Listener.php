@@ -1,8 +1,8 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\Security\Http\Firewall;
+namespace Mayflower\WSSEAuthenticationBundle\Security\Http\Firewall;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;

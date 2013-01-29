@@ -1,8 +1,8 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
+namespace Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;

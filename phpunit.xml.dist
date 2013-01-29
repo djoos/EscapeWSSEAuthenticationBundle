@@ -12,7 +12,7 @@
 		 bootstrap="Tests/bootstrap.php"
 >
 	<testsuites>
-		<testsuite name="EscapeWSSEAuthenticationBundle Test Suite">
+		<testsuite name="MayflowerWSSEAuthenticationBundle Test Suite">
 			<directory suffix="Test.php">./Tests</directory>
 		</testsuite>
 	</testsuites>

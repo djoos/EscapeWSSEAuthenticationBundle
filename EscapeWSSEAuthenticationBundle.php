@@ -1,12 +1,12 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle;
+namespace Mayflower\WSSEAuthenticationBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory\Factory;
+use Mayflower\WSSEAuthenticationBundle\DependencyInjection\Security\Factory\Factory;
 
-class EscapeWSSEAuthenticationBundle extends Bundle
+class MayflowerWSSEAuthenticationBundle extends Bundle
 {
 	  public function build(ContainerBuilder $container)
 	  {

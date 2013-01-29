@@ -1,9 +1,9 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\Tests\Security\Http\Firewall;
+namespace Mayflower\WSSEAuthenticationBundle\Tests\Security\Http\Firewall;
 
-use Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener;
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Mayflower\WSSEAuthenticationBundle\Security\Http\Firewall\Listener;
+use Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
 use Symfony\Component\HttpFoundation\Response;
 

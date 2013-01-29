@@ -1,9 +1,9 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\Tests\Security\Core\Authentication\Provider;
+namespace Mayflower\WSSEAuthenticationBundle\Tests\Security\Core\Authentication\Provider;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
+use Mayflower\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
 class ProviderTestSimple extends Provider
 {

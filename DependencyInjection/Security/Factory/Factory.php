@@ -1,6 +1,6 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory;
+namespace Mayflower\WSSEAuthenticationBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

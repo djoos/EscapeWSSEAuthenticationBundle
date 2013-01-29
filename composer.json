@@ -3,7 +3,7 @@
 	"type": "symfony-bundle",
 	"description": "Symfony2 bundle to implement WSSE authentication",
 	"keywords": ["wsse", "authentication", "bundle"],
-	"homepage": "https://github.com/Mayflower/EscapeWSSEAuthenticationBundle",
+	"homepage": "https://github.com/Mayflower/MayflowerWSSEAuthenticationBundle",
 	"license": "MIT",
 	"authors": [
 		{
@@ -16,7 +16,7 @@
         },
 		{
 			"name": "Community contributors",
-			"homepage": "https://github.com/Mayflower/EscapeWSSEAuthenticationBundle/graphs/contributors"
+			"homepage": "https://github.com/Mayflower/MayflowerWSSEAuthenticationBundle/graphs/contributors"
 		}
 	],
 	"extra": {
