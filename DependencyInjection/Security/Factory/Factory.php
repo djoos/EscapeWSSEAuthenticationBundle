@@ -10,38 +10,37 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityF
 
 class Factory implements SecurityFactoryInterface
 {
-	public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
-	{
-		$providerId = 'security.authentication.provider.wsse.'.$id;
-		$container
-			->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.wsse'))
-			->replaceArgument(0, new Reference($userProvider))
-			->replaceArgument(1, $config['nonce_dir'])
-			->replaceArgument(2, $config['lifetime']);
+    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    {
+        $providerId = 'security.authentication.provider.wsse.'.$id;
+        $container
+            ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.wsse'))
+            ->replaceArgument(0, new Reference($userProvider))
+            ->replaceArgument(1, $config['nonce_dir'])
+            ->replaceArgument(2, $config['lifetime']);
 
-		$listenerId = 'security.authentication.listener.wsse.'.$id;
-		$listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.wsse'));
+        $listenerId = 'security.authentication.listener.wsse.'.$id;
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.wsse'));
 
-		return array($providerId, $listenerId, $defaultEntryPoint);
-	}
+        return array($providerId, $listenerId, $defaultEntryPoint);
+    }
 
-	public function getPosition()
-	{
-		return 'pre_auth';
-	}
+    public function getPosition()
+    {
+        return 'pre_auth';
+    }
 
-	public function getKey()
-	{
-		return 'wsse';
-	}
+    public function getKey()
+    {
+        return 'wsse';
+    }
 
-	public function addConfiguration(NodeDefinition $node)
-	{
-		$node
-			->children()
-				->scalarNode('nonce_dir')->defaultValue(null)->end()
-				->scalarNode('lifetime')->defaultValue(300)->end()
-			->end()
-		;
-	}
+    public function addConfiguration(NodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->scalarNode('nonce_dir')->defaultValue(null)->end()
+                ->scalarNode('lifetime')->defaultValue(300)->end()
+            ->end();
+    }
 }
