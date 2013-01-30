@@ -6,8 +6,8 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 class Token extends AbstractToken
 {
-	public function getCredentials()
-	{
-		return '';
-	}
+    public function getCredentials()
+    {
+        return '';
+    }
 }

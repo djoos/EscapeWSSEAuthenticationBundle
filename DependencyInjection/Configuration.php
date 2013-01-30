@@ -13,11 +13,10 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('escape_wsse_authentication');
 
         $rootNode
-	        ->children()
-    		    ->scalarNode('authentication_provider_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider')->end()
-        		->scalarNode('authentication_listener_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener')->end()
-        	->end()
-        ;
+            ->children()
+                ->scalarNode('authentication_provider_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider')->end()
+                ->scalarNode('authentication_listener_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener')->end()
+            ->end();
 
         return $treeBuilder;
     }

@@ -9,15 +9,15 @@ use Symfony\Component\Config\FileLocator;
 
 class EscapeWSSEAuthenticationExtension extends Extension
 {
-	public function load(array $configs, ContainerBuilder $container)
-	{
-		$configuration = new Configuration();
-		$config = $this->processConfiguration($configuration, $configs);
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
 
-		$loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-		$loader->load('services.yml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yml');
 
-		$container->setParameter('authentication.provider.wsse.class', $config['authentication_provider_class']);
-		$container->setParameter('authentication.listener.wsse.class', $config['authentication_listener_class']);
-	}
+        $container->setParameter('authentication.provider.wsse.class', $config['authentication_provider_class']);
+        $container->setParameter('authentication.listener.wsse.class', $config['authentication_listener_class']);
+    }
 }
