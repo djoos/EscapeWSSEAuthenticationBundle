@@ -46,10 +46,11 @@ app/config/security.yml
 
 nonce_dir: location where nonces will be saved (use null to skip nonce-validation)
 lifetime: lifetime of nonce
-
+realm: identifies the set of resources to which the authentication information will apply (WWW-Authenticate)
+profile: WSSE profile (WWW-Authenticate)
 ```
 firewalls:
     wsse_secured:
         pattern:   ^/api/.*
-        wsse:      { nonce_dir: null, lifetime: 300 } 
+        wsse:      { nonce_dir: null, lifetime: 300, realm: null, profile: UsernameToken } 
 ```
