@@ -1,8 +1,8 @@
 services:
     security.authentication.provider.wsse:
         class:  %authentication.provider.wsse.class%
-        arguments: ['', %kernel.cache_dir%/security/nonces, 300]
+        arguments: [null, %kernel.cache_dir%/security/nonces, 300]
 
     security.authentication.listener.wsse:
         class:  %authentication.listener.wsse.class%
-        arguments: [@security.context, @security.authentication.manager]
+        arguments: [@security.context, @security.authentication.manager, null, "UsernameToken"]

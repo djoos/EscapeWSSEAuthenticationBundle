@@ -16,14 +16,19 @@ use UnexpectedValueException;
 
 class Listener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
     private $wsseHeader;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager)
+    protected $securityContext;
+    protected $authenticationManager;
+    protected $realm;
+    protected $profile;
+
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $realm=null, $profile="UsernameToken")
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
+        $this->realm = $realm;
+        $this->profile = $profile;
     }
 
     /**
@@ -120,6 +125,11 @@ class Listener implements ListenerInterface
         {
             $response = new Response();
             $response->setStatusCode(401);//unauthorized
+            $response->headers->add(
+                array(
+                    'WWW-Authenticate' => sprintf('WSSE realm="%s", profile="%s"',$this->realm,$this->profile)
+                )
+            );
             $event->setResponse($response);
 
             return;
