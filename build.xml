@@ -1,0 +1,53 @@
+<project name="EscapeWSSEAuthenticationBundle" default="build">
+	<property file="build.properties"/>
+	<available property="composer.exists" file="${composer.path}" />
+
+	<target name="build" depends="prepare,lint,phpunit"/>
+
+        <target name="prepare" depends="clean,vendor" description="Prepare for build">
+		<mkdir dir="${basedir}/Tests/nonceDir"/>
+
+                <mkdir dir="${basedir}/build/api"/>
+                <mkdir dir="${basedir}/build/code-browser"/>
+                <mkdir dir="${basedir}/build/coverage"/>
+                <mkdir dir="${basedir}/build/logs"/>
+                <mkdir dir="${basedir}/build/pdepend"/>
+                <mkdir dir="${basedir}/build/phpdox"/>
+        </target>
+
+	<target name="clean" description="Cleanup build artifacts">
+		<delete dir="${basedir}/build/api"/>
+		<delete dir="${basedir}/build/code-browser"/>
+		<delete dir="${basedir}/build/coverage"/>
+		<delete dir="${basedir}/build/logs"/>
+		<delete dir="${basedir}/build/pdepend"/>
+		<delete dir="${basedir}/build/phpdox"/>
+	 </target>
+
+	<target name="vendor" description="Load composer repositories" depends="composer">
+		<exec executable="composer" failonerror="true">
+			<arg value="install" />
+			<arg value="--dev" />
+		</exec>
+	</target>
+
+	 <target name="composer" description="Download composer" unless="composer.exists">
+		<get src="${composer.url}" dest="${composer.path}" />
+	 </target>
+
+	<target name="lint" description="Perform syntax check">
+		<apply executable="php" failonerror="true">
+			<arg value="-l" />
+			<fileset dir="${basedir}">
+				<include name="**/*.php" />
+				<exclude name="vendor/" />
+			</fileset>
+		</apply>
+	</target>
+
+	<target name="phpunit" description="Run unit tests with PHPUnit">
+		<exec executable="phpunit" failonerror="true"/>
+	</target>
+
+
+</project>

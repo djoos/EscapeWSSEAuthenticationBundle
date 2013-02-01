@@ -4,13 +4,8 @@ php:
   - 5.3
   - 5.4
 
-env:
-  - SYMFONY_VERSION=origin/2.1
-
-before_script:
-    - curl -s http://getcomposer.org/installer | php
-    - php composer.phar install --dev
-    - mkdir -p "Tests/nonceDir"
+script:
+    - ant
 
 branches:
   except:
