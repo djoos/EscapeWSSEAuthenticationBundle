@@ -2,6 +2,5 @@ phpunit.xml
 composer.lock
 composer.phar
 vendor/
-build.properties
 cache.properties
 build/
