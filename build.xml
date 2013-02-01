@@ -3,7 +3,7 @@
 	<available property="composer.exists" file="${composer.path}" />
 
 	<target name="test" depends="vendor,lint,phpunit" />
-	<target name="report" depends="prepare,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpdcd,phpcs,phpcs-ci" />
+	<target name="report" depends="prepare,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpcs,phpcs-ci" />
 
         <target name="prepare" depends="clean" description="Prepare for build">
                 <mkdir dir="${basedir}/build/logs" />
@@ -91,11 +91,13 @@
                 </exec>
         </target>
 
+<!--
         <target name="phpdcd" description="Scan for code that is no longer used using PHP Dead Code Detector">
                 <exec executable="phpdcd">
                         <arg path="${basedir}" />
                 </exec>
         </target>
+-->
 
 	<target name="phpcs" description="Find coding standard violations using PHP Code Sniffer">
 		<exec executable="phpcs">
