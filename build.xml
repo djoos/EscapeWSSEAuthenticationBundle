@@ -3,7 +3,7 @@
 	<available property="composer.exists" file="${composer.path}" />
 
 	<target name="test" depends="vendor,lint,phpunit" />
-	<target name="analysis" depends="prepare,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpdcd,phpcs,phpcs-ci" />
+	<target name="report" depends="prepare,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpdcd,phpcs,phpcs-ci" />
 
         <target name="prepare" depends="clean" description="Prepare for build">
                 <mkdir dir="${basedir}/build/logs" />
