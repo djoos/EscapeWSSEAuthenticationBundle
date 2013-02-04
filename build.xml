@@ -3,11 +3,13 @@
 	<available property="composer.exists" file="${composer.path}" />
 
 	<target name="test" depends="vendor,lint,phpunit" />
-	<target name="report" depends="prepare,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpcs,phpcs-ci" />
+	<target name="report" depends="prepare,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpcs,phpcs-ci,phpdoc,phpcb" />
 
         <target name="prepare" depends="clean" description="Prepare for build">
                 <mkdir dir="${basedir}/build/logs" />
                 <mkdir dir="${basedir}/build/pdepend" />
+                <mkdir dir="${basedir}/build/api" />
+                <mkdir dir="${basedir}/build/code-browser" />
         </target>
 
 	<target name="clean" description="Cleanup build artifacts">
@@ -112,8 +114,31 @@
 			<arg value="--report=checkstyle" />
 			<arg value="--report-file=${basedir}/build/logs/checkstyle.xml" />
 			<arg value="--standard=${phpcs.standard}" />
-			<arg value="--ignore=vendor/*" /> 
+			<arg value="--ignore=vendor/*" />
 			<arg path="${basedir}" />
+		</exec>
+	</target>
+
+	<target name="phpdoc" description="Generate API documentation using PHP Documentor">
+		<exec executable="phpdoc">
+			<arg value="--directory" />
+                        <arg path="${basedir}" />
+                        <arg value="--target" />
+                        <arg path="${basedir}/build/api" />
+                        <arg value="--ignore" />
+                        <arg value="vendor/" />
+		</exec>
+	</target>
+
+	<target name="phpcb" description="Aggregate tool output with PHP Code Browser">
+		<exec executable="phpcb">
+			<arg value="--log" />
+                        <arg path="${basedir}/build/logs" />
+                        <arg value="--source" />
+                        <arg path="${basedir}" />
+                        <arg value="--output" />
+                        <arg path="${basedir}/build/code-browser" />
+                        <arg value="--ignore=vendor" />
 		</exec>
 	</target>
 </project>
