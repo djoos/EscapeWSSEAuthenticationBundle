@@ -48,6 +48,7 @@ nonce_dir: location where nonces will be saved (use null to skip nonce-validatio
 lifetime: lifetime of nonce
 realm: identifies the set of resources to which the authentication information will apply (WWW-Authenticate)
 profile: WSSE profile (WWW-Authenticate)
+verbose: receive authentication exception message in body of response, for debugging purposes only (default: false)
 ```
 firewalls:
     wsse_secured:

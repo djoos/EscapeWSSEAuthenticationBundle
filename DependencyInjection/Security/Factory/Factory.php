@@ -23,7 +23,8 @@ class Factory implements SecurityFactoryInterface
         $container
             ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.wsse'))
             ->replaceArgument(2, $config['realm'])
-            ->replaceArgument(3, $config['profile']);
+            ->replaceArgument(3, $config['profile'])
+            ->replaceArgument(4, $config['verbose']);
 
         return array($providerId, $listenerId, $defaultEntryPoint);
     }
@@ -46,6 +47,7 @@ class Factory implements SecurityFactoryInterface
                 ->scalarNode('lifetime')->defaultValue(300)->end()
                 ->scalarNode('realm')->defaultValue(null)->end()
                 ->scalarNode('profile')->defaultValue('UsernameToken')->end()
+                ->booleanNode('verbose')->defaultValue(false)->end()
             ->end();
     }
 }
