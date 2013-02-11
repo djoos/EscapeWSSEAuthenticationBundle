@@ -45,7 +45,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         list($authProviderId,
              $listenerId,
              $entryPointId
-        ) = $factory->create($container, 'foo', array('nonce_dir' => 'nonce', 'lifetime' => 300, 'realm' => 'EscapeWSSEAuthenticationBundle', 'profile' => 'UsernameToken'), 'user_provider', 'entry_point');
+        ) = $factory->create($container, 'foo', array('nonce_dir' => 'nonce', 'lifetime' => 300, 'realm' => 'EscapeWSSEAuthenticationBundle', 'profile' => 'UsernameToken', 'verbose' => false), 'user_provider', 'entry_point');
 
         // auth provider
         $this->assertEquals('security.authentication.provider.wsse.foo', $authProviderId);

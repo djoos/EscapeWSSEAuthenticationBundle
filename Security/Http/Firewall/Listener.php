@@ -22,13 +22,15 @@ class Listener implements ListenerInterface
     protected $authenticationManager;
     protected $realm;
     protected $profile;
+    protected $verbose;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $realm=null, $profile="UsernameToken")
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $realm=null, $profile="UsernameToken", $verbose=false)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
         $this->realm = $realm;
         $this->profile = $profile;
+        $this->verbose = $verbose;
     }
 
     /**
@@ -114,7 +116,7 @@ class Listener implements ListenerInterface
             $response = new Response();
             $response->setStatusCode(403);//forbidden
 
-            if($ae_message)
+            if($ae_message && $this->verbose)
             {
                 $response->setContent($ae_message);
             }
