@@ -16,6 +16,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('authentication_provider_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider')->end()
                 ->scalarNode('authentication_listener_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener')->end()
+                ->scalarNode('authentication_entry_point_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Http\EntryPoint\EntryPoint')->end()
             ->end();
 
         return $treeBuilder;

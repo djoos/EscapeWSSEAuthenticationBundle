@@ -5,4 +5,8 @@ services:
 
     security.authentication.listener.wsse:
         class:  %authentication.listener.wsse.class%
-        arguments: [@security.context, @security.authentication.manager, null, "UsernameToken", false]
+        arguments: [@security.context, @security.authentication.manager]
+
+    security.authentication.entry_point.wsse:
+        class:  %authentication.entry_point.wsse.class%
+        arguments: [@logger, null, "UsernameToken"]

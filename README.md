@@ -38,6 +38,7 @@ app/config/config.yml
 escape_wsse_authentication:
     authentication_provider_class: Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider
     authentication_listener_class: Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener
+    authentication_entry_point_class: Escape\WSSEAuthenticationBundle\Security\Http\EntryPoint\EntryPoint
 ```
 
 ## Usage example
@@ -48,10 +49,10 @@ nonce_dir: location where nonces will be saved (use null to skip nonce-validatio
 lifetime: lifetime of nonce
 realm: identifies the set of resources to which the authentication information will apply (WWW-Authenticate)
 profile: WSSE profile (WWW-Authenticate)
-verbose: receive authentication exception message in body of response, for debugging purposes only (default: false)
+
 ```
 firewalls:
     wsse_secured:
         pattern:   ^/api/.*
-        wsse:      { nonce_dir: null, lifetime: 300, realm: null, profile: UsernameToken } 
+        wsse:      { nonce_dir: null, lifetime: 300, realm: "Secured API", profile: "UsernameToken" } 
 ```

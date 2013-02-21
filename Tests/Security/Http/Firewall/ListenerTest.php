@@ -29,48 +29,19 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
      */
     private $authenticationManager;
 
-    private $realm;
-    private $profile;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $authenticationEntryPoint;
 
     protected function setUp()
     {
-        $this->responseEvent = $this->getMockBuilder('\Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $this->responseEvent = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
         $this->request = $this->getMockForAbstractClass('Symfony\Component\HttpFoundation\Request');
         $this->responseEvent->expects($this->once())->method('getRequest')->will($this->returnValue($this->request));
-        $this->securityContext = $this->getMock('\Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->authenticationManager = $this->getMock('\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-        $this->realm = "EscapeWSSEAuthenticationBundle";
-        $this->profile = "UsernameToken";
-    }
-
-    /**
-     * @test
-     */
-    public function handleUnauthorized()
-    {
-        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->realm, $this->profile);
-        $response = new Response();
-        $response->setStatusCode(401);//unauthorized
-        $response->headers->add(
-            array(
-                'WWW-Authenticate' => sprintf('WSSE realm="%s", profile="%s"', $this->realm, $this->profile)
-            )
-        );
-        $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
-        $result = $listener->handle($this->responseEvent);
-    }
-
-    /**
-     * @test
-     */
-    public function handleForbidden()
-    {
-        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->realm, $this->profile);
-        $this->request->headers->add(array('X-WSSE'=>'temp'));
-        $response = new Response();
-        $response->setStatusCode(403);//forbidden
-        $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
-        $result = $listener->handle($this->responseEvent);
+        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+        $this->authenticationEntryPoint = $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
     }
 
     /**
@@ -87,7 +58,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($tokenMock2));
         $this->securityContext->expects($this->once())->method('setToken')->with($tokenMock2);
         $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="admin", PasswordDigest="admin", Nonce="admin", Created="2010-12-12 20:00:00"'));
-        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->realm, $this->profile);
+        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->authenticationEntryPoint);
         $listener->handle($this->responseEvent);
     }
 
@@ -105,7 +76,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($response));
         $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
         $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="admin", PasswordDigest="admin", Nonce="admin", Created="2010-12-12 20:00:00"'));
-        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->realm, $this->profile);
+        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->authenticationEntryPoint);
         $listener->handle($this->responseEvent);
     }
 }

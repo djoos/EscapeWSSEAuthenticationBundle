@@ -19,14 +19,14 @@ class Factory implements SecurityFactoryInterface
             ->replaceArgument(1, $config['nonce_dir'])
             ->replaceArgument(2, $config['lifetime']);
 
+        $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
+
         $listenerId = 'security.authentication.listener.wsse.'.$id;
         $container
             ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.wsse'))
-            ->replaceArgument(2, $config['realm'])
-            ->replaceArgument(3, $config['profile'])
-            ->replaceArgument(4, $config['verbose']);
+            ->addArgument(new Reference($entryPointId));
 
-        return array($providerId, $listenerId, $defaultEntryPoint);
+        return array($providerId, $listenerId, $entryPointId);
     }
 
     public function getPosition()
@@ -47,7 +47,23 @@ class Factory implements SecurityFactoryInterface
                 ->scalarNode('lifetime')->defaultValue(300)->end()
                 ->scalarNode('realm')->defaultValue(null)->end()
                 ->scalarNode('profile')->defaultValue('UsernameToken')->end()
-                ->booleanNode('verbose')->defaultValue(false)->end()
             ->end();
+    }
+
+    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
+    {
+        if($defaultEntryPoint !== null)
+        {
+            return $defaultEntryPoint;
+        }
+
+        $entryPointId = 'security.authentication.entry_point.wsse.'.$id;
+
+        $container
+            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.entry_point.wsse'))
+            ->addArgument($config['realm'])
+            ->addArgument($config['profile']);
+
+        return $entryPointId;
     }
 }
