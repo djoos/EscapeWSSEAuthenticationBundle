@@ -10,6 +10,7 @@ use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use UnexpectedValueException;
@@ -20,21 +21,64 @@ class Listener implements ListenerInterface
 
     protected $securityContext;
     protected $authenticationManager;
-    protected $realm;
-    protected $profile;
-    protected $verbose;
+    protected $authenticationEntryPoint;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $realm=null, $profile="UsernameToken", $verbose=false)
+    public function __construct(
+        SecurityContextInterface $securityContext,
+        AuthenticationManagerInterface $authenticationManager,
+        AuthenticationEntryPointInterface $authenticationEntryPoint
+    )
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
-        $this->realm = $realm;
-        $this->profile = $profile;
-        $this->verbose = $verbose;
+        $this->authenticationEntryPoint = $authenticationEntryPoint;
+    }
+
+    public function handle(GetResponseEvent $event)
+    {
+        $request = $event->getRequest();
+
+        //find out if the current request contains any information by which the user might be authenticated
+        if(!$request->headers->has('X-WSSE'))
+        {
+            return;
+        }
+
+        $ae_message = null;
+        $this->wsseHeader = $request->headers->get('X-WSSE');
+        $wsseHeaderInfo = $this->parseHeader();
+
+        if($wsseHeaderInfo !== false)
+        {
+            $token = new Token();
+            $token->setUser($wsseHeaderInfo['Username']);
+
+            $token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
+            $token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
+            $token->setAttribute('created', $wsseHeaderInfo['Created']);
+
+            try
+            {
+                $returnValue = $this->authenticationManager->authenticate($token);
+
+                if($returnValue instanceof TokenInterface)
+                {
+                    return $this->securityContext->setToken($returnValue);
+                }
+                else if($returnValue instanceof Response)
+                {
+                    return $event->setResponse($returnValue);
+                }
+            }
+            catch(AuthenticationException $ae)
+            {
+                $event->setResponse($this->authenticationEntryPoint->start($request, $ae));
+            }
+        }
     }
 
     /**
-     * The method returns value of a bit header by the key
+     * This method returns the value of a bit header by the key
      *
      * @param $key
      * @return mixed
@@ -51,8 +95,10 @@ class Listener implements ListenerInterface
     }
 
     /**
-     * The method parses X-WSSE header. If Username, PasswordDigest, Nonce and Created are exists then it returns value of them.
-     * Otherwise the method returns false.
+     * This method parses the X-WSSE header
+     * 
+     * If Username, PasswordDigest, Nonce and Created exist then it returns their value,
+     * otherwise the method returns false.
      *
      * @return array|bool
      */
@@ -73,68 +119,5 @@ class Listener implements ListenerInterface
         }
 
         return $result;
-    }
-
-    public function handle(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
-
-        if($request->headers->has('X-WSSE'))
-        {
-            $ae_message = null;
-            $this->wsseHeader = $request->headers->get('X-WSSE');
-            $wsseHeaderInfo = $this->parseHeader();
-
-            if($wsseHeaderInfo !== false)
-            {
-                $token = new Token();
-                $token->setUser($wsseHeaderInfo['Username']);
-
-                $token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
-                $token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
-                $token->setAttribute('created', $wsseHeaderInfo['Created']);
-
-                try
-                {
-                    $returnValue = $this->authenticationManager->authenticate($token);
-
-                    if($returnValue instanceof TokenInterface)
-                    {
-                        return $this->securityContext->setToken($returnValue);
-                    }
-                    else if($returnValue instanceof Response)
-                    {
-                        return $event->setResponse($returnValue);
-                    }
-                }
-                catch(AuthenticationException $ae)
-                {
-                    $ae_message = $ae->getMessage();
-                }
-            }
-
-            $response = new Response();
-            $response->setStatusCode(403);//forbidden
-
-            if($ae_message && $this->verbose)
-            {
-                $response->setContent($ae_message);
-            }
-
-            $event->setResponse($response);
-        }
-        else
-        {
-            $response = new Response();
-            $response->setStatusCode(401);//unauthorized
-            $response->headers->add(
-                array(
-                    'WWW-Authenticate' => sprintf('WSSE realm="%s", profile="%s"',$this->realm,$this->profile)
-                )
-            );
-            $event->setResponse($response);
-
-            return;
-        }
     }
 }

@@ -19,5 +19,6 @@ class EscapeWSSEAuthenticationExtension extends Extension
 
         $container->setParameter('authentication.provider.wsse.class', $config['authentication_provider_class']);
         $container->setParameter('authentication.listener.wsse.class', $config['authentication_listener_class']);
+        $container->setParameter('authentication.entry_point.wsse.class', $config['authentication_entry_point_class']);
     }
 }
