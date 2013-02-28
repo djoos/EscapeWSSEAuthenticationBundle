@@ -10,20 +10,22 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityF
 
 class Factory implements SecurityFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPoint)
     {
-        $providerId = 'security.authentication.provider.wsse.'.$id;
+        $providerId = 'escape_wsse_authentication.provider.'.$id;
+
         $container
-            ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.wsse'))
-            ->replaceArgument(0, new Reference($userProvider))
+            ->setDefinition($providerId, new DefinitionDecorator('escape_wsse_authentication.provider'))
+            ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(1, $config['nonce_dir'])
             ->replaceArgument(2, $config['lifetime']);
 
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
 
-        $listenerId = 'security.authentication.listener.wsse.'.$id;
+        $listenerId = 'escape_wsse_authentication.listener.'.$id;
+
         $container
-            ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.wsse'))
+            ->setDefinition($listenerId, new DefinitionDecorator('escape_wsse_authentication.listener'))
             ->addArgument(new Reference($entryPointId));
 
         return array($providerId, $listenerId, $entryPointId);
@@ -57,10 +59,10 @@ class Factory implements SecurityFactoryInterface
             return $defaultEntryPoint;
         }
 
-        $entryPointId = 'security.authentication.entry_point.wsse.'.$id;
+        $entryPointId = 'escape_wsse_authentication.entry_point.'.$id;
 
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.entry_point.wsse'))
+            ->setDefinition($entryPointId, new DefinitionDecorator('escape_wsse_authentication.entry_point'))
             ->addArgument($config['realm'])
             ->addArgument($config['profile']);
 

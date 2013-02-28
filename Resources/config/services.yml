@@ -1,12 +1,12 @@
 services:
-    security.authentication.provider.wsse:
-        class:  %authentication.provider.wsse.class%
+    escape_wsse_authentication.provider:
+        class:  %escape_wsse_authentication.provider.class%
         arguments: [null, %kernel.cache_dir%/security/nonces, 300]
 
-    security.authentication.listener.wsse:
-        class:  %authentication.listener.wsse.class%
+    escape_wsse_authentication.listener:
+        class:  %escape_wsse_authentication.listener.class%
         arguments: [@security.context, @security.authentication.manager]
 
-    security.authentication.entry_point.wsse:
-        class:  %authentication.entry_point.wsse.class%
+    escape_wsse_authentication.entry_point:
+        class:  %escape_wsse_authentication.entry_point.class%
         arguments: [@logger, null, "UsernameToken"]

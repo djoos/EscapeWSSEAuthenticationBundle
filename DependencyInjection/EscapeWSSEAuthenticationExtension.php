@@ -17,8 +17,16 @@ class EscapeWSSEAuthenticationExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('authentication.provider.wsse.class', $config['authentication_provider_class']);
-        $container->setParameter('authentication.listener.wsse.class', $config['authentication_listener_class']);
-        $container->setParameter('authentication.entry_point.wsse.class', $config['authentication_entry_point_class']);
+        $container->setParameter('escape_wsse_authentication.provider.class', $config['authentication_provider_class']);
+        $container->setParameter('escape_wsse_authentication.listener.class', $config['authentication_listener_class']);
+        $container->setParameter('escape_wsse_authentication.entry_point.class', $config['authentication_entry_point_class']);
+    }
+
+    //https://github.com/symfony/symfony/issues/1768#issuecomment-1653074
+    //"However, if the default placement of underscores doesn't work for you,
+    //you can simply overwrite Extension::getAlias() and Bundle::getContainerExtension()."
+    public function getAlias()
+    {
+        return 'escape_wsse_authentication';
     }
 }
