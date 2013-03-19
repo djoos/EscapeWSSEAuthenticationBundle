@@ -63,8 +63,8 @@ class Factory implements SecurityFactoryInterface
 
         $container
             ->setDefinition($entryPointId, new DefinitionDecorator('escape_wsse_authentication.entry_point'))
-            ->addArgument($config['realm'])
-            ->addArgument($config['profile']);
+            ->replaceArgument(1, $config['realm'])
+            ->replaceArgument(2, $config['profile']);
 
         return $entryPointId;
     }
