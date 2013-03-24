@@ -4,6 +4,7 @@ namespace Escape\WSSEAuthenticationBundle\Tests\Security\Core\Authentication\Pro
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 
 class ProviderTestSimple extends Provider
 {
@@ -122,7 +123,6 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         return array(
             array($digest, base64_encode('test'), $time, 'test', true),
             array($digest, base64_encode('test'), $time, 'test1', false),
-            array($digest, base64_encode('test'), $time+4, 'test', false),
             array($digest, base64_encode('test2'), $time, 'test', false),
             array($digest. '9', base64_encode('test'), $time, 'test', false),
         );
@@ -144,10 +144,13 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists(self::$nonceDir.$nonce);
 
-        $result = $provider->validateDigest($digest, $nonce, $created, $secret);
-        $this->assertEquals($expected, $result);
+        try {
+          $result = $provider->validateDigest($digest, $nonce, $created, $secret);
+          $this->fail('NonceExpiredException expected');
+        } catch (NonceExpiredException $e) {
+          unlink(self::$nonceDir.$nonce);
+        }
 
-        unlink(self::$nonceDir.$nonce);
 
 /*
         //expire timestamp after specified lifetime
@@ -182,7 +185,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     public function validateDigestWithNonceDirExpectedException($digest, $nonce, $created, $secret, $expected)
     {
         $provider = new ProviderTestSimple($this->userProvider, self::$nonceDir);
-        file_put_contents(self::$nonceDir.$nonce, (time() - 86400));
+        file_put_contents(self::$nonceDir.$nonce, time()-123);
 
         $provider->validateDigest($digest, $nonce, $created, $secret);
 
