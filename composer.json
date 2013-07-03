@@ -17,7 +17,7 @@
     ],
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2.x-dev"
+            "dev-master": "2.3.x-dev"
         }
     },
     "minimum-stability": "dev",
@@ -25,8 +25,8 @@
         "php": ">=5.3.2"
     },
     "require-dev": {
-        "symfony/framework-bundle": "2.2.*",
-        "symfony/security-bundle": "2.2.*"
+        "symfony/framework-bundle": "2.3.*",
+        "symfony/security-bundle": "2.3.*"
     },
     "autoload": {
         "psr-0": { "Escape\\WSSEAuthenticationBundle": "" }

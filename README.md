@@ -11,7 +11,7 @@ composer.json
 ```
 "require": {
     ...
-    "escapestudios/wsse-authentication-bundle": "2.2.x-dev",
+    "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
     ...
 }
 ```
