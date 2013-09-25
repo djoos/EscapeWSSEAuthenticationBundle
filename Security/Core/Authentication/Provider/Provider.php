@@ -71,19 +71,17 @@ class Provider implements AuthenticationProviderInterface
         }
 
         //validate secret
-//http://symfony.com/doc/current/components/security/authentication.html
-//+ update documentation for easier implementation of the bundle, eg. how to generate the header?!
-$encoder = $this->encoderFactory->getEncoder($user);
+        $encoder = $this->encoderFactory->getEncoder($user);
 
-$expected = $encoder->encodePassword(
-    sprintf(
-        '%s%s%s',
-        base64_decode($nonce),
-        $created,
-        $secret
-    ),
-    ""
-);
+        $expected = $encoder->encodePassword(
+            sprintf(
+                '%s%s%s',
+                base64_decode($nonce),
+                $created,
+                $secret
+            ),
+            ""
+        );
 
         return $digest === $expected;
     }
