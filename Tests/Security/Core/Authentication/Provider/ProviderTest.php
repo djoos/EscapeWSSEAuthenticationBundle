@@ -257,7 +257,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
         $time = date('Y-m-d H:i:s');
 
-        $encoder = new \Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder('sha1', true, 1);
+        $encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $digest = $encoder->encodePassword(
             sprintf(
                 '%s%s%s',
