@@ -17,8 +17,9 @@ class Factory implements SecurityFactoryInterface
         $container
             ->setDefinition($providerId, new DefinitionDecorator('escape_wsse_authentication.provider'))
             ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(1, $config['nonce_dir'])
-            ->replaceArgument(2, $config['lifetime']);
+            ->replaceArgument(1, new Reference('security.encoder_factory'))
+            ->replaceArgument(2, $config['nonce_dir'])
+            ->replaceArgument(3, $config['lifetime']);
 
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
 
