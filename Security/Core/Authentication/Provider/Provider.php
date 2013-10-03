@@ -4,6 +4,7 @@ namespace Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -50,8 +51,18 @@ class Provider implements AuthenticationProviderInterface
 
         if($this->nonceDir)
         {
-            //validate nonce is unique within specified lifetime
-            if(file_exists($this->nonceDir.'/'.$nonce) && file_get_contents($this->nonceDir.'/'.$nonce) + $this->lifetime > time())
+            $fs = new Filesystem();
+
+            if(!$fs->exists($this->nonceDir))
+            {
+                $fs->mkdir($this->nonceDir);
+            }
+
+            //validate whether nonce is unique within specified lifetime
+            if(
+                file_exists($this->nonceDir.DIRECTORY_SEPARATOR.$nonce) &&
+                file_get_contents($this->nonceDir.DIRECTORY_SEPARATOR.$nonce) + $this->lifetime > time()
+            )
             {
                 throw new NonceExpiredException('Previously used nonce detected.');
             }
