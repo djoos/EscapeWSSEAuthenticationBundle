@@ -43,8 +43,7 @@ class Provider implements AuthenticationProviderInterface
     {
         $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
 
-        if($user && $this->validateDigest($token->getAttribute('digest'), $token->getAttribute('nonce'), $token->getAttribute('created'), $user->getPassword()))
-        {
+        if ($user && $this->validateDigest($token->getAttribute('digest'), $token->getAttribute('nonce'), $token->getAttribute('created'), $this->getUserSecret($user))) {
             $authenticatedToken = new Token($user->getRoles());
             $authenticatedToken->setUser($user);
             $authenticatedToken->setAuthenticated(true);
@@ -53,6 +52,16 @@ class Provider implements AuthenticationProviderInterface
         }
 
         throw new AuthenticationException('WSSE authentication failed.');
+    }
+
+    public function supports(TokenInterface $token)
+    {
+        return $token instanceof Token;
+    }
+
+    protected function getUserSecret($user)
+    {
+        return $user->getPassword();
     }
 
     protected function validateDigest($digest, $nonce, $created, $secret)
@@ -78,10 +87,5 @@ class Provider implements AuthenticationProviderInterface
         $expected = base64_encode(sha1(base64_decode($nonce).$created.$secret, true));
 
         return $digest === $expected;
-    }
-
-    public function supports(TokenInterface $token)
-    {
-        return $token instanceof Token;
     }
 }
