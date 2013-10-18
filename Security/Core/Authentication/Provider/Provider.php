@@ -24,26 +24,11 @@ class Provider implements AuthenticationProviderInterface
         $this->lifetime = $lifetime;
     }
 
-    public function getLifetime()
-    {
-        return $this->lifetime;
-    }
-
-    public function getNonceDir()
-    {
-        return $this->nonceDir;
-    }
-
-    public function getUserProvider()
-    {
-        return $this->userProvider;
-    }
-
     public function authenticate(TokenInterface $token)
     {
-        $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
+        $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if ($user && $this->validateDigest($token->getAttribute('digest'), $token->getAttribute('nonce'), $token->getAttribute('created'), $this->getUserSecret($user))) {
+        if ($user && $this->validateDigest($token->getAttribute('digest'), $token->getAttribute('nonce'), $token->getAttribute('created'), $this->getSecretForUser($user))) {
             $authenticatedToken = new Token($user->getRoles());
             $authenticatedToken->setUser($user);
             $authenticatedToken->setAuthenticated(true);
@@ -67,7 +52,7 @@ class Provider implements AuthenticationProviderInterface
     protected function validateDigest($digest, $nonce, $created, $secret)
     {
         //expire timestamp after specified lifetime
-        if(time() - strtotime($created) > $this->getLifetime())
+        if(time() - strtotime($created) > $this->lifetime)
         {
             throw new CredentialsExpiredException('Token has expired.');
         }
@@ -75,12 +60,12 @@ class Provider implements AuthenticationProviderInterface
         if($this->nonceDir)
         {
             //validate nonce is unique within specified lifetime
-            if(file_exists($this->getNonceDir().'/'.$nonce) && file_get_contents($this->getNonceDir().'/'.$nonce) + $this->getLifetime() > time())
+            if(file_exists($this->nonceDir.'/'.$nonce) && file_get_contents($this->nonceDir.'/'.$nonce) + $this->lifetime > time())
             {
                 throw new NonceExpiredException('Previously used nonce detected.');
             }
 
-            file_put_contents($this->getNonceDir().'/'.$nonce, time());
+            file_put_contents($this->nonceDir.'/'.$nonce, time());
         }
 
         //validate secret
