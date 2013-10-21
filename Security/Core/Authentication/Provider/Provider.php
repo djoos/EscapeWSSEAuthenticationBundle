@@ -40,7 +40,7 @@ class Provider implements AuthenticationProviderInterface
     {
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if($user && $this->validateDigest($user, $token->getAttribute('digest'), $token->getAttribute('nonce'), $token->getAttribute('created'), $user->getPassword()))
+        if($user && $this->validateDigest($user, $token->getAttribute('digest'), $token->getAttribute('nonce'), $token->getAttribute('created'), $this->getSecret($user)))
         {
             $authenticatedToken = new Token($user->getRoles());
             $authenticatedToken->setUser($user);
@@ -51,6 +51,11 @@ class Provider implements AuthenticationProviderInterface
 
         throw new AuthenticationException('WSSE authentication failed.');
     }
+
+    protected function getSecret($user)
+    {
+        return $user->getPassword();
+    } 
 
     protected function validateDigest($user, $digest, $nonce, $created, $secret)
     {
