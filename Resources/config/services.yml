@@ -1,7 +1,7 @@
 services:
     escape_wsse_authentication.provider:
         class:  %escape_wsse_authentication.provider.class%
-        arguments: [null, %kernel.cache_dir%/security/nonces, 300]
+        arguments: [null, null, %kernel.cache_dir%/security/nonces, 300]
 
     escape_wsse_authentication.listener:
         class:  %escape_wsse_authentication.listener.class%

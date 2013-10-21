@@ -8,18 +8,23 @@ use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 
 class ProviderTestSimple extends Provider
 {
-    public function validateDigest($digest, $nonce, $created, $secret)
+    public function validateDigest($user, $digest, $nonce, $created, $secret)
     {
-        return parent::validateDigest($digest, $nonce, $created, $secret);
+        return parent::validateDigest($user, $digest, $nonce, $created, $secret);
     }
 }
 
 class ProviderTest extends \PHPUnit_Framework_TestCase
 {
     private $userProvider;
+    private $encoderFactory;
+    private $user;
+
     private static $nonceDir;
 
     //the setUpBeforeClass() template method is called before the first test of the test case class is run
@@ -30,7 +35,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         self::$nonceDir = __DIR__.'/../../../../nonceDir/';
 
         $fs = new Filesystem();
-        
+
         if(!$fs->exists(self::$nonceDir))
         {
             $fs->mkdir(self::$nonceDir);
@@ -50,7 +55,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
             $fs->remove(self::$nonceDir);
         }
     }
-    
+
     private function clearDir()
     {
         $fs = new Filesystem();
@@ -68,6 +73,16 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+        $this->encoderFactory = new EncoderFactory(
+            array(
+                'Symfony\Component\Security\Core\User\UserInterface' => array(
+                    'class' => 'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder',
+                    'arguments' => array('sha1', true, 1)
+                )
+            )
+        );
+        $this->user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+
         $this->clearDir();
     }
 
@@ -79,7 +94,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function supports($token, $expected)
     {
-        $provider = new Provider($this->userProvider);
+        $provider = new Provider($this->userProvider, $this->encoderFactory);
         $this->assertEquals($expected, $provider->supports($token));
     }
 
@@ -101,8 +116,8 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestExpireTime()
     {
-        $provider = new ProviderTestSimple($this->userProvider);
-        $provider->validateDigest(null, null, date('r', (time() - 86400)), null);
+        $provider = new ProviderTestSimple($this->userProvider, $this->encoderFactory);
+        $provider->validateDigest(null, null, null, date('r', (time() - 86400)), null);
     }
 
     /**
@@ -115,8 +130,8 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithoutNonceDir($digest, $nonce, $created, $secret, $expected)
     {
-        $provider = new ProviderTestSimple($this->userProvider);
-        $result = $provider->validateDigest($digest, $nonce, $created, $secret);
+        $provider = new ProviderTestSimple($this->userProvider, $this->encoderFactory);
+        $result = $provider->validateDigest($this->user, $digest, $nonce, $created, $secret);
         $this->assertEquals($expected, $result);
     }
 
@@ -143,14 +158,14 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithNonceDir($digest, $nonce, $created, $secret, $expected)
     {
-        $provider = new ProviderTestSimple($this->userProvider, self::$nonceDir);
-        $result = $provider->validateDigest($digest, $nonce, $created, $secret);
+        $provider = new ProviderTestSimple($this->userProvider, $this->encoderFactory, self::$nonceDir);
+        $result = $provider->validateDigest($this->user, $digest, $nonce, $created, $secret);
         $this->assertEquals($expected, $result);
 
         $this->assertFileExists(self::$nonceDir.$nonce);
 
         try {
-          $result = $provider->validateDigest($digest, $nonce, $created, $secret);
+          $result = $provider->validateDigest($this->user, $digest, $nonce, $created, $secret);
           $this->fail('NonceExpiredException expected');
         } catch (NonceExpiredException $e) {
           unlink(self::$nonceDir.$nonce);
@@ -189,10 +204,10 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithNonceDirExpectedException($digest, $nonce, $created, $secret, $expected)
     {
-        $provider = new ProviderTestSimple($this->userProvider, self::$nonceDir);
+        $provider = new ProviderTestSimple($this->userProvider, $this->encoderFactory, self::$nonceDir);
         file_put_contents(self::$nonceDir.$nonce, time()-123);
 
-        $provider->validateDigest($digest, $nonce, $created, $secret);
+        $provider->validateDigest($this->user, $digest, $nonce, $created, $secret);
 
         unlink(self::$nonceDir.$nonce);
     }
@@ -208,13 +223,13 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function authenticateExpectedException()
     {
-        $provider = new ProviderTestSimple($this->userProvider);
+        $provider = new ProviderTestSimple($this->userProvider, $this->encoderFactory);
         $provider->authenticate(new Token());
-        
+
 /*
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if($user && $this->validateDigest($token->digest, $token->nonce, $token->created, $user->getPassword()))
+        if($user && $this->validateDigest($user, $token->digest, $token->nonce, $token->created, $user->getPassword()))
         {
             $authenticatedToken = new Token($user->getRoles());
             $authenticatedToken->setUser($user);
@@ -236,24 +251,33 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function authenticate()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $user->expects($this->once())->method('getPassword')->will($this->returnValue('test'));
-        $user->expects($this->once())->method('getRoles')->will($this->returnValue(array()));
-        $this->userProvider->expects($this->once())->method('loadUserByUsername')->will($this->returnValue($user));
+        $this->user->expects($this->once())->method('getPassword')->will($this->returnValue('test'));
+        $this->user->expects($this->once())->method('getRoles')->will($this->returnValue(array()));
+        $this->userProvider->expects($this->once())->method('loadUserByUsername')->will($this->returnValue($this->user));
 
         $expected = new Token();
-        $expected->setUser($user);
+        $expected->setUser($this->user);
         $expected->setAuthenticated(true);
 
         $time = date('Y-m-d H:i:s');
-        $digest = base64_encode(sha1(base64_decode(base64_encode('test')).$time.'test', true));
+
+        $encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
+        $digest = $encoder->encodePassword(
+            sprintf(
+                '%s%s%s',
+                'test',
+                $time,
+                'test'
+            ),
+            ""
+        );
 
         $token = new Token();
         $token->setAttribute('digest', $digest);
         $token->setAttribute('nonce', base64_encode('test'));
         $token->setAttribute('created', $time);
 
-        $provider = new ProviderTestSimple($this->userProvider);
+        $provider = new ProviderTestSimple($this->userProvider, $this->encoderFactory);
         $result = $provider->authenticate($token);
 
         $this->assertEquals($expected, $result);

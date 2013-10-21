@@ -71,8 +71,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 'index_0' => new Reference('user_provider'),
-                'index_1' => $nonce_dir,
-                'index_2' => $lifetime
+                'index_1' => new Reference('security.encoder_factory'),
+                'index_2' => $nonce_dir,
+                'index_3' => $lifetime
             ),
             $definition->getArguments()
         );
