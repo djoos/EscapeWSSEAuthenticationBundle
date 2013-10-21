@@ -12,12 +12,31 @@ class Factory implements SecurityFactoryInterface
 {
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPoint)
     {
+        $encoderId = 'escape_wsse_authentication.encoder.'.$id;
+
+        $container->setDefinition($encoderId, new DefinitionDecorator('escape_wsse_authentication.encoder'));
+
+        if(isset($config['encoder']['algorithm']))
+        {
+            $container->getDefinition($encoderId)->replaceArgument(0, $config['encoder']['algorithm']);
+        }
+
+        if(isset($config['encoder']['encodeHashAsBase64']))
+        {
+            $container->getDefinition($encoderId)->replaceArgument(1, $config['encoder']['encodeHashAsBase64']);
+        }
+
+        if(isset($config['encoder']['iterations']))
+        {
+            $container->getDefinition($encoderId)->replaceArgument(2, $config['encoder']['iterations']);
+        }
+
         $providerId = 'escape_wsse_authentication.provider.'.$id;
 
         $container
             ->setDefinition($providerId, new DefinitionDecorator('escape_wsse_authentication.provider'))
             ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(1, new Reference('security.encoder_factory'))
+            ->replaceArgument(1, new Reference($encoderId))
             ->replaceArgument(2, $config['nonce_dir'])
             ->replaceArgument(3, $config['lifetime']);
 
@@ -29,7 +48,7 @@ class Factory implements SecurityFactoryInterface
             ->setDefinition($listenerId, new DefinitionDecorator('escape_wsse_authentication.listener'))
             ->addArgument(new Reference($entryPointId));
 
-        return array($providerId, $listenerId, $entryPointId);
+        return array($providerId, $listenerId, $entryPointId, $encoderId);
     }
 
     public function getPosition()
@@ -50,6 +69,13 @@ class Factory implements SecurityFactoryInterface
                 ->scalarNode('lifetime')->defaultValue(300)->end()
                 ->scalarNode('realm')->defaultValue(null)->end()
                 ->scalarNode('profile')->defaultValue('UsernameToken')->end()
+                ->arrayNode('encoder')
+                    ->children()
+                        ->scalarNode('algorithm')->end()
+                        ->scalarNode('encodeHashAsBase64')->end()
+                        ->scalarNode('iterations')->end()
+                    ->end()
+                ->end()
             ->end();
     }
 

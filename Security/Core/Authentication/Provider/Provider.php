@@ -7,7 +7,7 @@ use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
@@ -16,22 +16,22 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class Provider implements AuthenticationProviderInterface
 {
     private $userProvider;
-    private $encoderFactory;
+    private $encoder;
     private $nonceDir;
     private $lifetime;
 
     /**
      * Constructor.
      *
-     * @param UserProviderInterface   $userProvider               An UserProviderInterface instance
-     * @param EncoderFactoryInterface $encoderFactory             An EncoderFactoryInterface instance
-     * @param string                  $nonceDir                   The nonce dir
-     * @param int                     $lifetime                   The lifetime
+     * @param UserProviderInterface    $userProvider              An UserProviderInterface instance
+     * @param PasswordEncoderInterface $encoder                   A PasswordEncoderInterface instance
+     * @param string                   $nonceDir                  The nonce dir
+     * @param int                      $lifetime                  The lifetime
     */
-    public function __construct(UserProviderInterface $userProvider, EncoderFactoryInterface $encoderFactory, $nonceDir=null, $lifetime=300)
+    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder, $nonceDir=null, $lifetime=300)
     {
         $this->userProvider = $userProvider;
-        $this->encoderFactory = $encoderFactory;
+        $this->encoder = $encoder;
         $this->nonceDir = $nonceDir;
         $this->lifetime = $lifetime;
     }
@@ -87,9 +87,7 @@ class Provider implements AuthenticationProviderInterface
         }
 
         //validate secret
-        $encoder = $this->encoderFactory->getEncoder($user);
-
-        $expected = $encoder->encodePassword(
+        $expected = $this->encoder->encodePassword(
             sprintf(
                 '%s%s%s',
                 base64_decode($nonce),

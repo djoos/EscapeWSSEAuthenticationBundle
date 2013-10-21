@@ -10,3 +10,7 @@ services:
     escape_wsse_authentication.entry_point:
         class:  %escape_wsse_authentication.entry_point.class%
         arguments: [@logger, null, "UsernameToken"]
+
+    escape_wsse_authentication.encoder:
+        class:  %escape_wsse_authentication.encoder.class%
+        arguments: ['sha1', true, 1]

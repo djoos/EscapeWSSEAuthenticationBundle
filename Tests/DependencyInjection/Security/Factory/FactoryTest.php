@@ -47,9 +47,20 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $realm = 'TheRealm';
         $profile = 'TheProfile';
 
+        $algorithm = 'sha1';
+        $encodeHashAsBase64 = true;
+        $iterations = 1;
+
+        $encoder = array(
+            'algorithm' => $algorithm,
+            'encodeHashAsBase64' => $encodeHashAsBase64,
+            'iterations' => $iterations
+        );
+
         list($authProviderId,
              $listenerId,
-             $entryPointId
+             $entryPointId,
+             $encoderId
         ) = $factory->create(
             $container,
             'foo',
@@ -57,10 +68,25 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
                 'nonce_dir' => $nonce_dir,
                 'lifetime' => $lifetime,
                 'realm' => $realm,
-                'profile' => $profile
+                'profile' => $profile,
+                'encoder' => $encoder
             ),
             'user_provider',
             'entry_point'
+        );
+
+        //encoder
+        $this->assertEquals('escape_wsse_authentication.encoder.foo', $encoderId);
+        $this->assertTrue($container->hasDefinition('escape_wsse_authentication.encoder.foo'));
+
+        $definition = $container->getDefinition('escape_wsse_authentication.encoder.foo');
+        $this->assertEquals(
+            array(
+                'index_0' => $algorithm,
+                'index_1' => $encodeHashAsBase64,
+                'index_2' => $iterations
+            ),
+            $definition->getArguments()
         );
 
         //auth provider
@@ -71,7 +97,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 'index_0' => new Reference('user_provider'),
-                'index_1' => new Reference('security.encoder_factory'),
+                'index_1' => new Reference($encoderId),
                 'index_2' => $nonce_dir,
                 'index_3' => $lifetime
             ),

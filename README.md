@@ -52,6 +52,22 @@ firewalls:
 
 ## Advanced configuration
 
+### Specify custom digest algorithm
+
+app/config/security.yml
+
+```
+firewalls:
+    wsse_secured:
+        ...
+        wsse:
+            ...
+            encoder: #digest algorithm
+                algorithm: sha1
+                encodeHashAsBase64: true
+                iterations: 1
+```
+
 ### Specify custom authentication class(es)
 
 app/config/config.yml
@@ -62,18 +78,5 @@ escape_wsse_authentication:
     authentication_provider_class: Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider
     authentication_listener_class: Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener
     authentication_entry_point_class: Escape\WSSEAuthenticationBundle\Security\Http\EntryPoint\EntryPoint
+    authentication_encoder_class: Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder
 ```
-
-### Specify an encoder of choice (digest algorithm)
-
-app/config/security.yml
-
-```
-encoders:
-    Symfony\Component\Security\Core\User\User:
-        algorithm: sha1
-        iterations: 1
-        encode_as_base64: true
-```
-
-FYI: 1 iteration SHA1 encoded as base64 was the digest algorithm previously hard-coded into the bundle.

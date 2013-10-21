@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('authentication_provider_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider')->end()
                 ->scalarNode('authentication_listener_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener')->end()
                 ->scalarNode('authentication_entry_point_class')->defaultValue('Escape\WSSEAuthenticationBundle\Security\Http\EntryPoint\EntryPoint')->end()
+                ->scalarNode('authentication_encoder_class')->defaultValue('Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder')->end()
             ->end();
 
         return $treeBuilder;
