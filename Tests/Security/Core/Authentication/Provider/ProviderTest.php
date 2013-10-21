@@ -4,6 +4,9 @@ namespace Escape\WSSEAuthenticationBundle\Tests\Security\Core\Authentication\Pro
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 
 class ProviderTestSimple extends Provider
@@ -26,11 +29,11 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
         self::$nonceDir = __DIR__.'/../../../../nonceDir/';
 
-        //setup
-        if(!is_dir(self::$nonceDir))
+        $fs = new Filesystem();
+        
+        if(!$fs->exists(self::$nonceDir))
         {
-            //create temp nonceDir
-            mkdir(self::$nonceDir);
+            $fs->mkdir(self::$nonceDir);
         }
     }
 
@@ -39,24 +42,26 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     {
         parent::tearDownAfterClass();
 
+        $fs = new Filesystem();
+
         //cleanup
-        if(is_dir(self::$nonceDir))
+        if($fs->exists(self::$nonceDir))
         {
-            //remove temp nonceDir
-            rmdir(self::$nonceDir);
+            $fs->remove(self::$nonceDir);
         }
     }
     
     private function clearDir()
     {
-        $handle = opendir(self::$nonceDir);
-        
-        while($tmp = readdir($handle))
+        $fs = new Filesystem();
+
+        $finder = new Finder();
+
+        $finder->files()->in(self::$nonceDir);
+
+        foreach($finder as $file)
         {
-            if($tmp != '..' && $tmp != '.' && $tmp != '')
-            {
-                unlink(self::$nonceDir.$tmp);
-            }
+            $fs->remove($file->getRealPath());
         }
     }
 
