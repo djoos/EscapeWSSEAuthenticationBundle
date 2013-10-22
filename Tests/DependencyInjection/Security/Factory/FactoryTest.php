@@ -59,8 +59,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         list($authProviderId,
              $listenerId,
-             $entryPointId,
-             $encoderId
+             $entryPointId
         ) = $factory->create(
             $container,
             'foo',
@@ -74,6 +73,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             'user_provider',
             'entry_point'
         );
+
+        $encoderId = $factory->getEncoderId();
 
         //encoder
         $this->assertEquals('escape_wsse_authentication.encoder.foo', $encoderId);

@@ -10,25 +10,27 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityF
 
 class Factory implements SecurityFactoryInterface
 {
+    private $encoderId;
+
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPoint)
     {
-        $encoderId = 'escape_wsse_authentication.encoder.'.$id;
+        $this->encoderId = 'escape_wsse_authentication.encoder.'.$id;
 
-        $container->setDefinition($encoderId, new DefinitionDecorator('escape_wsse_authentication.encoder'));
+        $container->setDefinition($this->encoderId, new DefinitionDecorator('escape_wsse_authentication.encoder'));
 
         if(isset($config['encoder']['algorithm']))
         {
-            $container->getDefinition($encoderId)->replaceArgument(0, $config['encoder']['algorithm']);
+            $container->getDefinition($this->encoderId)->replaceArgument(0, $config['encoder']['algorithm']);
         }
 
         if(isset($config['encoder']['encodeHashAsBase64']))
         {
-            $container->getDefinition($encoderId)->replaceArgument(1, $config['encoder']['encodeHashAsBase64']);
+            $container->getDefinition($this->encoderId)->replaceArgument(1, $config['encoder']['encodeHashAsBase64']);
         }
 
         if(isset($config['encoder']['iterations']))
         {
-            $container->getDefinition($encoderId)->replaceArgument(2, $config['encoder']['iterations']);
+            $container->getDefinition($this->encoderId)->replaceArgument(2, $config['encoder']['iterations']);
         }
 
         $providerId = 'escape_wsse_authentication.provider.'.$id;
@@ -36,7 +38,7 @@ class Factory implements SecurityFactoryInterface
         $container
             ->setDefinition($providerId, new DefinitionDecorator('escape_wsse_authentication.provider'))
             ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(1, new Reference($encoderId))
+            ->replaceArgument(1, new Reference($this->encoderId))
             ->replaceArgument(2, $config['nonce_dir'])
             ->replaceArgument(3, $config['lifetime']);
 
@@ -48,7 +50,7 @@ class Factory implements SecurityFactoryInterface
             ->setDefinition($listenerId, new DefinitionDecorator('escape_wsse_authentication.listener'))
             ->addArgument(new Reference($entryPointId));
 
-        return array($providerId, $listenerId, $entryPointId, $encoderId);
+        return array($providerId, $listenerId, $entryPointId);
     }
 
     public function getPosition()
@@ -59,6 +61,11 @@ class Factory implements SecurityFactoryInterface
     public function getKey()
     {
         return 'wsse';
+    }
+
+    public function getEncoderId()
+    {
+        return $this->encoderId;
     }
 
     public function addConfiguration(NodeDefinition $node)
