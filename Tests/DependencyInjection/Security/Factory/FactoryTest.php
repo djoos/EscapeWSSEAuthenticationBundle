@@ -57,10 +57,10 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             'iterations' => $iterations
         );
 
-        list($encoderId,
-             $authProviderId,
+        list($authProviderId,
              $listenerId,
-             $entryPointId
+             $entryPointId,
+             $encoderId
         ) = $factory->create(
             $container,
             'foo',

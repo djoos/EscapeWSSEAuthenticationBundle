@@ -48,7 +48,7 @@ class Factory implements SecurityFactoryInterface
             ->setDefinition($listenerId, new DefinitionDecorator('escape_wsse_authentication.listener'))
             ->addArgument(new Reference($entryPointId));
 
-        return array($encoderId, $providerId, $listenerId, $entryPointId);
+        return array($providerId, $listenerId, $entryPointId, $encoderId);
     }
 
     public function getPosition()
