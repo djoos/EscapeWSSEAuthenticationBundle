@@ -1,144 +1,155 @@
 <project name="EscapeWSSEAuthenticationBundle" default="test">
-	<property file="build.properties" />
-	<available property="composer.exists" file="${composer.path}" />
+    <property file="build.properties" />
+    <available property="composer.exists" file="${composer.path}" />
 
-	<target name="test" depends="vendor,lint,phpunit" />
-	<target name="report" depends="prepare,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpcs,phpcs-ci,phpdoc,phpcb" />
+    <target name="test" depends="vendor,lint,phpunit" />
+    <target name="report" depends="vendor,lint,prepare,phpunit-report,phploc,pdepend,phpcpd,phpmd,phpmd-ci,phpcs,phpcs-ci,phpdoc,phpcb" />
 
-        <target name="prepare" depends="clean" description="Prepare for build">
-                <mkdir dir="${basedir}/build/logs" />
-                <mkdir dir="${basedir}/build/pdepend" />
-                <mkdir dir="${basedir}/build/api" />
-                <mkdir dir="${basedir}/build/code-browser" />
-        </target>
+    <target name="prepare" depends="clean" description="Prepare for build">
+        <mkdir dir="${basedir}/build/logs" />
+        <mkdir dir="${basedir}/build/pdepend" />
+        <mkdir dir="${basedir}/build/api" />
+        <mkdir dir="${basedir}/build/code-browser" />
+    </target>
 
-	<target name="clean" description="Cleanup build artifacts">
-		<delete dir="${basedir}/build" />
-	</target>
+    <target name="clean" description="Cleanup build artifacts">
+        <delete dir="${basedir}/build" />
+    </target>
 
-	<target name="vendor" description="Load composer repositories" depends="composer">
-		<exec executable="composer" failonerror="true">
-			<arg value="install" />
-			<arg value="--dev" />
-		</exec>
-	</target>
+    <target name="vendor" description="Load composer repositories" depends="composer">
+        <exec executable="composer" failonerror="true">
+            <arg value="install" />
+            <arg value="--dev" />
+        </exec>
+    </target>
 
-	<target name="composer" description="Download composer" unless="composer.exists">
-		<get src="${composer.url}" dest="${composer.path}" />
-	</target>
+    <target name="composer" description="Download composer" unless="composer.exists">
+        <get src="${composer.url}" dest="${composer.path}" />
+    </target>
 
-	<target name="lint" description="Perform syntax check">
-		<apply executable="php" failonerror="true">
-			<arg value="-l" />
-			<fileset dir="${basedir}">
-				<include name="**/*.php" />
-				<exclude name="vendor/" />
-			</fileset>
-		</apply>
-	</target>
+    <target name="lint" description="Perform syntax check">
+        <apply executable="php" failonerror="true">
+            <arg value="-l" />
+            <fileset dir="${basedir}">
+                <include name="**/*.php" />
+                <exclude name="vendor/" />
+            </fileset>
+        </apply>
+    </target>
 
-	<target name="phpunit" description="Run unit tests with PHPUnit">
-		<exec executable="phpunit" failonerror="true" />
-	</target>
+    <target name="phpunit" description="Run unit tests with PHPUnit">
+        <exec executable="phpunit" failonerror="true" />
+    </target>
 
-	<target name="phploc" description="Measure project size using PHP Lines Of Code">
-		<exec executable="phploc">
-			<arg value="--log-csv" />
-			<arg value="${basedir}/build/logs/phploc.csv" />
-                        <arg value="--exclude" />
-                        <arg value="vendor"/>
-			<arg path="${basedir}" />
-		</exec>
-	</target>
+    <target name="phpunit-report" description="Run unit tests with PHPUnit and produce report output">
+        <exec executable="phpunit" failonerror="true" >
+            <arg value="--coverage-html" />
+            <arg value="${basedir}/build/coverage" />
+            <arg value="--coverage-clover" />
+            <arg value="${basedir}/build/logs/clover.xml" />
+            <arg value="--log-junit" />
+            <arg value="${basedir}/build/logs/junit.xml" />
+        </exec>
+    </target>
 
-	<target name="pdepend" description="Calculate software metrics using PHP Depend">
-		<exec executable="pdepend">
-			<arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml" />
-			<arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg" />
-			<arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg" />
-			<arg value="--ignore=vendor" />
-			<arg path="${basedir}" />
-		</exec>
-	</target>
+    <target name="phploc" description="Measure project size using PHP Lines Of Code">
+        <exec executable="phploc">
+            <arg value="--log-csv" />
+            <arg value="${basedir}/build/logs/phploc.csv" />
+            <arg value="--exclude" />
+            <arg value="vendor"/>
+            <arg path="${basedir}" />
+        </exec>
+    </target>
 
-	<target name="phpcpd" description="Find duplicate code using PHP Copy/Paste Detector">
-		<exec executable="phpcpd">
-			<arg value="--log-pmd" />
-			<arg value="${basedir}/build/logs/pmd-cpd.xml" />
-                        <arg value="--exclude" />
-                        <arg value="vendor"/>
-			<arg path="${basedir}" />
-		</exec>
-	</target>
+    <target name="pdepend" description="Calculate software metrics using PHP Depend">
+        <exec executable="pdepend">
+            <arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml" />
+            <arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg" />
+            <arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg" />
+            <arg value="--ignore=vendor" />
+            <arg path="${basedir}" />
+        </exec>
+    </target>
 
-	<target name="phpmd" description="Perform project mess detection using PHP Mess Detector">
-		<exec executable="phpmd">
-			<arg path="${basedir}" />
-			<arg value="text" />
-			<arg value="${phpmd.rules}" />
-                        <arg value="--exclude" />
-                        <arg value="vendor" />
-		</exec>
-	</target>
+    <target name="phpcpd" description="Find duplicate code using PHP Copy/Paste Detector">
+        <exec executable="phpcpd">
+            <arg value="--log-pmd" />
+            <arg value="${basedir}/build/logs/pmd-cpd.xml" />
+            <arg value="--exclude" />
+            <arg value="vendor"/>
+            <arg path="${basedir}" />
+        </exec>
+    </target>
 
-        <target name="phpmd-ci" description="Perform project mess detection using PHP Mess Detector">
-                <exec executable="phpmd">
-                        <arg path="${basedir}" />
-                        <arg value="xml" />
-			<arg value="${phpmd.rules}" />
-                        <arg value="--reportfile" />
-                        <arg value="${basedir}/build/logs/pmd.xml" />
-                        <arg value="--exclude" />
-                        <arg value="vendor" />
-                </exec>
-        </target>
+    <target name="phpmd" description="Perform project mess detection using PHP Mess Detector">
+        <exec executable="phpmd">
+            <arg path="${basedir}" />
+            <arg value="text" />
+            <arg value="${phpmd.rules}" />
+            <arg value="--exclude" />
+            <arg value="vendor" />
+        </exec>
+    </target>
+
+    <target name="phpmd-ci" description="Perform project mess detection using PHP Mess Detector">
+        <exec executable="phpmd">
+            <arg path="${basedir}" />
+            <arg value="xml" />
+            <arg value="${phpmd.rules}" />
+            <arg value="--reportfile" />
+            <arg value="${basedir}/build/logs/pmd.xml" />
+            <arg value="--exclude" />
+            <arg value="vendor" />
+        </exec>
+    </target>
 
 <!--
-        <target name="phpdcd" description="Scan for code that is no longer used using PHP Dead Code Detector">
-                <exec executable="phpdcd">
-                        <arg path="${basedir}" />
-                </exec>
-        </target>
+    <target name="phpdcd" description="Scan for code that is no longer used using PHP Dead Code Detector">
+        <exec executable="phpdcd">
+            <arg path="${basedir}" />
+        </exec>
+    </target>
 -->
 
-	<target name="phpcs" description="Find coding standard violations using PHP Code Sniffer">
-		<exec executable="phpcs">
-			<arg value="--standard=${phpcs.standard}" />
-			<arg value="--ignore=vendor/*" /> 
-			<arg path="${basedir}" />
-		</exec>
-	</target>
+    <target name="phpcs" description="Find coding standard violations using PHP Code Sniffer">
+        <exec executable="phpcs">
+            <arg value="--standard=${phpcs.standard}" />
+            <arg value="--ignore=vendor/*" /> 
+            <arg path="${basedir}" />
+        </exec>
+    </target>
 
-	<target name="phpcs-ci" description="Find coding standard violations using PHP Code Sniffer">
-		<exec executable="phpcs" output="/dev/null">
-			<arg value="--report=checkstyle" />
-			<arg value="--report-file=${basedir}/build/logs/checkstyle.xml" />
-			<arg value="--standard=${phpcs.standard}" />
-			<arg value="--ignore=vendor/*" />
-			<arg path="${basedir}" />
-		</exec>
-	</target>
+    <target name="phpcs-ci" description="Find coding standard violations using PHP Code Sniffer">
+        <exec executable="phpcs" output="/dev/null">
+            <arg value="--report=checkstyle" />
+            <arg value="--report-file=${basedir}/build/logs/checkstyle.xml" />
+            <arg value="--standard=${phpcs.standard}" />
+            <arg value="--ignore=vendor/*" />
+            <arg path="${basedir}" />
+        </exec>
+    </target>
 
-	<target name="phpdoc" description="Generate API documentation using PHP Documentor">
-		<exec executable="phpdoc">
-			<arg value="--directory" />
-                        <arg path="${basedir}" />
-                        <arg value="--target" />
-                        <arg path="${basedir}/build/api" />
-                        <arg value="--ignore" />
-                        <arg value="vendor/" />
-		</exec>
-	</target>
+    <target name="phpdoc" description="Generate API documentation using PHP Documentor">
+        <exec executable="phpdoc">
+            <arg value="--directory" />
+            <arg path="${basedir}" />
+            <arg value="--target" />
+            <arg path="${basedir}/build/api" />
+            <arg value="--ignore" />
+            <arg value="vendor/" />
+        </exec>
+    </target>
 
-	<target name="phpcb" description="Aggregate tool output with PHP Code Browser">
-		<exec executable="phpcb">
-			<arg value="--log" />
-                        <arg path="${basedir}/build/logs" />
-                        <arg value="--source" />
-                        <arg path="${basedir}" />
-                        <arg value="--output" />
-                        <arg path="${basedir}/build/code-browser" />
-                        <arg value="--ignore=vendor" />
-		</exec>
-	</target>
+    <target name="phpcb" description="Aggregate tool output with PHP Code Browser">
+        <exec executable="phpcb">
+            <arg value="--log" />
+            <arg path="${basedir}/build/logs" />
+            <arg value="--source" />
+            <arg path="${basedir}" />
+            <arg value="--output" />
+            <arg path="${basedir}/build/code-browser" />
+            <arg value="--ignore=vendor" />
+        </exec>
+    </target>
 </project>
