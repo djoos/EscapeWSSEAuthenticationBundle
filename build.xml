@@ -8,7 +8,7 @@
     <target name="prepare" depends="clean" description="Prepare for build">
         <mkdir dir="${basedir}/build/logs" />
         <mkdir dir="${basedir}/build/pdepend" />
-        <mkdir dir="${basedir}/build/api" />
+        <mkdir dir="${basedir}/build/docs" />
         <mkdir dir="${basedir}/build/code-browser" />
     </target>
 
@@ -130,12 +130,12 @@
         </exec>
     </target>
 
-    <target name="phpdoc" description="Generate API documentation using PHP Documentor">
+    <target name="phpdoc" description="Generate documentation using PHP Documentor">
         <exec executable="phpdoc">
             <arg value="--directory" />
             <arg path="${basedir}" />
             <arg value="--target" />
-            <arg path="${basedir}/build/api" />
+            <arg path="${basedir}/build/docs" />
             <arg value="--ignore" />
             <arg value="vendor/" />
         </exec>
