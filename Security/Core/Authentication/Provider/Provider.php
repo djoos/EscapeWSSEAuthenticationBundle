@@ -59,6 +59,12 @@ class Provider implements AuthenticationProviderInterface
 
     protected function validateDigest($user, $digest, $nonce, $created, $secret)
     {
+        //check whether timestamp is not in the future
+        if(strtotime($created) > time())
+        {
+            throw new CredentialsExpiredException('Future token detected.');
+        }
+
         //expire timestamp after specified lifetime
         if(time() - strtotime($created) > $this->lifetime)
         {
@@ -74,7 +80,8 @@ class Provider implements AuthenticationProviderInterface
                 $fs->mkdir($this->nonceDir);
             }
 
-            //validate whether nonce is unique within specified lifetime
+            //validate that nonce is unique within specified lifetime
+            //if it is not, this could be a replay attack
             if(
                 file_exists($this->nonceDir.DIRECTORY_SEPARATOR.$nonce) &&
                 file_get_contents($this->nonceDir.DIRECTORY_SEPARATOR.$nonce) + $this->lifetime > time()
