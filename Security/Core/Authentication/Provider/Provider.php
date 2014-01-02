@@ -19,6 +19,7 @@ class Provider implements AuthenticationProviderInterface
     private $encoder;
     private $nonceDir;
     private $lifetime;
+    private $futureTokenCheck;
 
     /**
      * Constructor.
@@ -27,13 +28,15 @@ class Provider implements AuthenticationProviderInterface
      * @param PasswordEncoderInterface $encoder                   A PasswordEncoderInterface instance
      * @param string                   $nonceDir                  The nonce dir
      * @param int                      $lifetime                  The lifetime
+     * @param boolean                  $futurnTokenCheck          Check whether timestamp is not in the future
     */
-    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder, $nonceDir=null, $lifetime=300)
+    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder, $nonceDir=null, $lifetime=300, $futureTokenCheck=true)
     {
         $this->userProvider = $userProvider;
         $this->encoder = $encoder;
         $this->nonceDir = $nonceDir;
         $this->lifetime = $lifetime;
+        $this->futureTokenCheck = $futureTokenCheck;
     }
 
     public function authenticate(TokenInterface $token)
@@ -60,7 +63,7 @@ class Provider implements AuthenticationProviderInterface
     protected function validateDigest($user, $digest, $nonce, $created, $secret)
     {
         //check whether timestamp is not in the future
-        if(strtotime($created) > time())
+        if($this->futureTokenCheck && strtotime($created) > time())
         {
             throw new CredentialsExpiredException('Future token detected.');
         }

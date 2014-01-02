@@ -40,7 +40,8 @@ class Factory implements SecurityFactoryInterface
             ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(1, new Reference($this->encoderId))
             ->replaceArgument(2, $config['nonce_dir'])
-            ->replaceArgument(3, $config['lifetime']);
+            ->replaceArgument(3, $config['lifetime'])
+            ->replaceArgument(4, $config['future_token_check']);
 
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
 
@@ -76,6 +77,7 @@ class Factory implements SecurityFactoryInterface
                 ->scalarNode('lifetime')->defaultValue(300)->end()
                 ->scalarNode('realm')->defaultValue(null)->end()
                 ->scalarNode('profile')->defaultValue('UsernameToken')->end()
+                ->scalarNode('future_token_check')->defaultValue(true)->end()
                 ->arrayNode('encoder')
                     ->children()
                         ->scalarNode('algorithm')->end()
