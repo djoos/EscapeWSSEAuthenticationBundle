@@ -44,10 +44,9 @@ firewalls:
     wsse_secured:
         pattern:   ^/api/.*
         wsse:
-            nonce_dir: null #location where nonces will be saved; use null to skip nonce-validation
-            lifetime: 300 #lifetime of nonce
             realm: "Secured API" #identifies the set of resources to which the authentication information will apply (WWW-Authenticate)
             profile: "UsernameToken" #WSSE profile (WWW-Authenticate)
+            lifetime: 300 #lifetime of nonce
 ```
 
 ## Advanced configuration
@@ -59,13 +58,36 @@ app/config/security.yml
 ```
 firewalls:
     wsse_secured:
-        ...
+        #...
         wsse:
-            ...
+            #...
             encoder: #digest algorithm
                 algorithm: sha1
                 encodeHashAsBase64: true
                 iterations: 1
+```
+
+### Specify custom nonce cache
+
+app/config/security.yml
+
+```
+services:
+    #...
+    cache_nonces:
+        class: Doctrine\Common\Cache\PhpFileCache
+        arguments: [%kernel.cache_dir%/path/to/nonces]
+```
+
+app/config/security.yml
+
+```
+firewalls:
+    wsse_secured:
+        #...
+        wsse:
+            #...
+            nonce_cache_service_id: cache_nonces
 ```
 
 ### Specify custom authentication class(es)
