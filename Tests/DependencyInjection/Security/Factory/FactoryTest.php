@@ -42,10 +42,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('escape_wsse_authentication.provider');
 
-        $nonce_dir = 'nonce';
-        $lifetime = 300;
         $realm = 'TheRealm';
         $profile = 'TheProfile';
+        $lifetime = 300;
 
         $algorithm = 'sha1';
         $encodeHashAsBase64 = true;
@@ -64,19 +63,18 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             $container,
             'foo',
             array(
-                'nonce_dir' => $nonce_dir,
-                'lifetime' => $lifetime,
                 'realm' => $realm,
                 'profile' => $profile,
-                'encoder' => $encoder
+                'encoder' => $encoder,
+                'lifetime' => $lifetime
             ),
             'user_provider',
             'entry_point'
         );
 
+        //encoder
         $encoderId = $factory->getEncoderId();
 
-        //encoder
         $this->assertEquals('escape_wsse_authentication.encoder.foo', $encoderId);
         $this->assertTrue($container->hasDefinition('escape_wsse_authentication.encoder.foo'));
 
@@ -90,6 +88,12 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             $definition->getArguments()
         );
 
+        //nonce cache
+        $nonceCacheId = $factory->getNonceCacheId();
+
+        $this->assertEquals('escape_wsse_authentication.nonce_cache.foo', $nonceCacheId);
+        $this->assertTrue($container->hasDefinition('escape_wsse_authentication.nonce_cache.foo'));
+
         //auth provider
         $this->assertEquals('escape_wsse_authentication.provider.foo', $authProviderId);
         $this->assertTrue($container->hasDefinition('escape_wsse_authentication.provider.foo'));
@@ -99,7 +103,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'index_0' => new Reference('user_provider'),
                 'index_1' => new Reference($encoderId),
-                'index_2' => $nonce_dir,
+                'index_2' => new Reference($nonceCacheId),
                 'index_3' => $lifetime
             ),
             $definition->getArguments()

@@ -4,7 +4,6 @@ namespace Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -13,11 +12,13 @@ use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+use Doctrine\Common\Cache\Cache;
+
 class Provider implements AuthenticationProviderInterface
 {
     private $userProvider;
     private $encoder;
-    private $nonceDir;
+    private $nonceCache;
     private $lifetime;
 
     /**
@@ -25,14 +26,14 @@ class Provider implements AuthenticationProviderInterface
      *
      * @param UserProviderInterface    $userProvider              An UserProviderInterface instance
      * @param PasswordEncoderInterface $encoder                   A PasswordEncoderInterface instance
-     * @param string                   $nonceDir                  The nonce dir
+     * @param Cache                    $nonceCache                The nonce cache
      * @param int                      $lifetime                  The lifetime
     */
-    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder, $nonceDir=null, $lifetime=300)
+    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder, Cache $nonceCache, $lifetime=300)
     {
         $this->userProvider = $userProvider;
         $this->encoder = $encoder;
-        $this->nonceDir = $nonceDir;
+        $this->nonceCache = $nonceCache;
         $this->lifetime = $lifetime;
     }
 
@@ -71,27 +72,14 @@ class Provider implements AuthenticationProviderInterface
             throw new CredentialsExpiredException('Token has expired.');
         }
 
-        if($this->nonceDir)
+        //validate that nonce is unique within specified lifetime
+        //if it is not, this could be a replay attack
+        if($this->nonceCache->contains($nonce))
         {
-            $fs = new Filesystem();
-
-            if(!$fs->exists($this->nonceDir))
-            {
-                $fs->mkdir($this->nonceDir);
-            }
-
-            //validate that nonce is unique within specified lifetime
-            //if it is not, this could be a replay attack
-            if(
-                file_exists($this->nonceDir.DIRECTORY_SEPARATOR.$nonce) &&
-                file_get_contents($this->nonceDir.DIRECTORY_SEPARATOR.$nonce) + $this->lifetime > time()
-            )
-            {
-                throw new NonceExpiredException('Previously used nonce detected.');
-            }
-
-            file_put_contents($this->nonceDir.'/'.$nonce, time());
+            throw new NonceExpiredException('Previously used nonce detected.');
         }
+
+        $this->nonceCache->save($nonce, time(), $this->lifetime);
 
         //validate secret
         $expected = $this->encoder->encodePassword(
@@ -105,6 +93,26 @@ class Provider implements AuthenticationProviderInterface
         );
 
         return $digest === $expected;
+    }
+
+    public function getUserProvider()
+    {
+        return $this->userProvider;
+    }
+
+    public function getEncoder()
+    {
+        return $this->encoder;
+    }
+
+    public function getNonceCache()
+    {
+        return $this->nonceCache;
+    }
+
+    public function getLifetime()
+    {
+        return $this->lifetime;
     }
 
     public function supports(TokenInterface $token)

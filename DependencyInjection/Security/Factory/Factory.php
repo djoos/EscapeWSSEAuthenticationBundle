@@ -11,6 +11,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityF
 class Factory implements SecurityFactoryInterface
 {
     private $encoderId;
+    private $nonceCacheId;
 
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPoint)
     {
@@ -33,13 +34,24 @@ class Factory implements SecurityFactoryInterface
             $container->getDefinition($this->encoderId)->replaceArgument(2, $config['encoder']['iterations']);
         }
 
+        if(isset($config['nonce_cache_service_id']))
+        {
+            $this->nonceCacheId = $config['nonce_cache_service_id'];
+        }
+        else
+        {
+            $this->nonceCacheId = 'escape_wsse_authentication.nonce_cache.'.$id;
+
+            $container->setDefinition($this->nonceCacheId, new DefinitionDecorator('escape_wsse_authentication.nonce_cache'));
+        }
+
         $providerId = 'escape_wsse_authentication.provider.'.$id;
 
         $container
             ->setDefinition($providerId, new DefinitionDecorator('escape_wsse_authentication.provider'))
             ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(1, new Reference($this->encoderId))
-            ->replaceArgument(2, $config['nonce_dir'])
+            ->replaceArgument(2, new Reference($this->nonceCacheId))
             ->replaceArgument(3, $config['lifetime']);
 
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
@@ -68,14 +80,18 @@ class Factory implements SecurityFactoryInterface
         return $this->encoderId;
     }
 
+    public function getNonceCacheId()
+    {
+        return $this->nonceCacheId;
+    }
+
     public function addConfiguration(NodeDefinition $node)
     {
         $node
             ->children()
-                ->scalarNode('nonce_dir')->defaultValue(null)->end()
-                ->scalarNode('lifetime')->defaultValue(300)->end()
                 ->scalarNode('realm')->defaultValue(null)->end()
                 ->scalarNode('profile')->defaultValue('UsernameToken')->end()
+                ->scalarNode('lifetime')->defaultValue(300)->end()
                 ->arrayNode('encoder')
                     ->children()
                         ->scalarNode('algorithm')->end()
@@ -83,6 +99,7 @@ class Factory implements SecurityFactoryInterface
                         ->scalarNode('iterations')->end()
                     ->end()
                 ->end()
+                ->scalarNode('nonce_cache_service_id')->defaultValue(null)->end()
             ->end();
     }
 

@@ -8,8 +8,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
+use Doctrine\Common\Cache\Cache;
+
+use \RunTimeException;
 
 class DeleteNoncesCommand extends ContainerAwareCommand
 {
@@ -20,8 +21,7 @@ class DeleteNoncesCommand extends ContainerAwareCommand
             ->setDescription('Delete nonces')
             ->setDefinition(
                 array(
-                    new InputArgument('nonceDir', InputArgument::REQUIRED, 'nonce directory'),
-                    new InputArgument('lifetime', InputArgument::REQUIRED, 'lifetime')
+                    new InputArgument('firewall', InputArgument::REQUIRED, 'firewall')
                 )
             )
             ->setHelp(<<<EOT
@@ -29,94 +29,65 @@ The <info>escape:wsseauthentication:nonces:delete</info> command deletes all exp
 
 <info>php app/console escape:wsseauthentication:nonces:delete</info>
 
-This interactive shell will ask you for a nonceDir and a lifetime.
+This interactive shell will ask you for a firewall.
 
-You can alternatively specify the nonceDir and lifetime arguments:
+You can alternatively specify the firewall argument:
 
-<info>php app/console escape:wsseauthentication:nonces:delete /path/to/security/nonces 300</info>
+<info>php app/console escape:wsseauthentication:nonces:delete secured_area</info>
 EOT
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $nonceDir = $input->getArgument('nonceDir');
-        $lifetime = $input->getArgument('lifetime');
+        $firewall = $input->getArgument('firewall');
 
-        $fs = new Filesystem();
+        $wsse_authentication_provider = $this->getContainer()->get(
+            sprintf(
+                '%s.%s',
+                'escape_wsse_authentication.provider',
+                $firewall
+            )
+        );
 
-        $finder = new Finder();
+        $nonceCache = $wsse_authentication_provider->getNonceCache();
 
-        $finder->files()->in($nonceDir);
-
-        $i = 0;
-
-        foreach($finder as $file)
+        if(!($nonceCache instanceof Cache))
         {
-            if(file_get_contents($file->getRealPath()) + $lifetime < time())
-            {
-                $file = $file->getRealPath();
-
-                $fs->remove($file);
-                $i++;
-
-                $output->writeln(sprintf('Deleted expired nonce <comment>%s</comment>.', $file));
-            }
+            throw new RunTimeException('invalid cache');
         }
+
+        //@todo only flush *expired* ones
+        //...via some getIds() method and then check or a (future) built-in Doctrine cache function?
+        $nonceCache->flushAll();
 
         $output->writeln(
             sprintf(
-                'Deleted <comment>%s</comment> expired nonces in <comment>%s</comment>.',
-                $i,
-                $nonceDir
+                'Deleted nonce cache ids for <comment>%s</comment> firewall.',
+                $firewall
             )
         );
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        if(!$input->getArgument('nonceDir'))
+        if(!$input->getArgument('firewall'))
         {
             $arg = $this->getHelper('dialog')->askAndValidate(
                 $output,
-                'Please specify the nonceDir:',
+                'Please specify a firewall:',
                 function($arg)
                 {
                     if(empty($arg))
                     {
-                        $error = 'nonceDir can not be empty';
-                        $output->writeln(sprintf('<error>%s</error>',$error));
-
-                        throw new Exception($error);
+                        throw new RunTimeException('firewall can not be empty');
                     }
 
                     return $arg;
                 }
             );
 
-            $input->setArgument('nonceDir', $arg);
-        }
-
-        if(!$input->getArgument('lifetime'))
-        {
-            $arg = $this->getHelper('dialog')->askAndValidate(
-                $output,
-                'Please specify the lifetime:',
-                function($arg)
-                {
-                    if(empty($arg))
-                    {
-                        $error = 'lifetime can not be empty';
-                        $output->writeln(sprintf('<error>%s</error>',$error));
-
-                        throw new Exception($error);
-                    }
-
-                    return $arg;
-                }
-            );
-
-            $input->setArgument('lifetime', $arg);
+            $input->setArgument('firewall', $arg);
         }
     }
 }
