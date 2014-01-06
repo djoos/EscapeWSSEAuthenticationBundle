@@ -46,6 +46,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $lifetime = 300;
         $realm = 'TheRealm';
         $profile = 'TheProfile';
+        $futurnTokenCheck = true;
 
         $algorithm = 'sha1';
         $encodeHashAsBase64 = true;
@@ -68,7 +69,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
                 'lifetime' => $lifetime,
                 'realm' => $realm,
                 'profile' => $profile,
-                'encoder' => $encoder
+                'encoder' => $encoder,
+                'future_token_check' => $futurnTokenCheck
             ),
             'user_provider',
             'entry_point'
@@ -100,7 +102,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
                 'index_0' => new Reference('user_provider'),
                 'index_1' => new Reference($encoderId),
                 'index_2' => $nonce_dir,
-                'index_3' => $lifetime
+                'index_3' => $lifetime,
+                'index_4' => $futurnTokenCheck
             ),
             $definition->getArguments()
         );

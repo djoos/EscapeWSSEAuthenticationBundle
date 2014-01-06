@@ -136,7 +136,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
             array($digest, base64_encode('test'), $time, 'test', true),
             array($digest, base64_encode('test'), $time, 'test1', false),
             array($digest, base64_encode('test2'), $time, 'test', false),
-            array($digest. '9', base64_encode('test'), $time, 'test', false),
+            array($digest. '9', base64_encode('test'), $time, 'test', false)
         );
     }
 
@@ -201,6 +201,19 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
         $provider->validateDigest($this->user, $digest, $nonce, $created, $secret);
 
+        unlink(self::$nonceDir.$nonce);
+    }
+
+    /**
+     * @test
+     * @dataProvider providerValidateDigest
+     */
+    public function validateDigestWithoutFuturnTokenCheck($digest, $nonce, $created, $secret, $expected)
+    {
+        $provider = new ProviderTestSimple($this->userProvider, $this->encoder, self::$nonceDir, 300, false);
+        $created = date('Y-m-d H:i:s', time() + 1); // put time to future
+
+        $provider->validateDigest($this->user, $digest, $nonce, $created, $secret);
         unlink(self::$nonceDir.$nonce);
     }
 
