@@ -61,7 +61,7 @@ class Provider implements AuthenticationProviderInterface
     protected function validateDigest($user, $digest, $nonce, $created, $secret)
     {
         //check whether timestamp is not in the future
-        if(strtotime($created) > time())
+        if($this->isTokenFromFuture($created))
         {
             throw new CredentialsExpiredException('Future token detected.');
         }
@@ -93,6 +93,11 @@ class Provider implements AuthenticationProviderInterface
         );
 
         return $digest === $expected;
+    }
+
+    protected function isTokenFromFuture($created)
+    {
+        return strtotime($created) > time();
     }
 
     public function getUserProvider()
