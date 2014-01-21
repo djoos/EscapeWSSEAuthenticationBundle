@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Doctrine\Common\Cache\Cache;
 
@@ -41,7 +42,16 @@ class Provider implements AuthenticationProviderInterface
     {
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if($user && $this->validateDigest($user, $token->getAttribute('digest'), $token->getAttribute('nonce'), $token->getAttribute('created'), $this->getSecret($user)))
+        if(
+            $user &&
+            $this->validateDigest(
+                $token->getAttribute('digest'),
+                $token->getAttribute('nonce'),
+                $token->getAttribute('created'),
+                $this->getSecret($user),
+                $this->getSalt($user)
+           )
+        )
         {
             $authenticatedToken = new Token($user->getRoles());
             $authenticatedToken->setUser($user);
@@ -53,12 +63,17 @@ class Provider implements AuthenticationProviderInterface
         throw new AuthenticationException('WSSE authentication failed.');
     }
 
-    protected function getSecret($user)
+    protected function getSecret(UserInterface $user)
     {
         return $user->getPassword();
-    } 
+    }
 
-    protected function validateDigest($user, $digest, $nonce, $created, $secret)
+    protected function getSalt(UserInterface $user)
+    {
+        return $user->getSalt();
+    }
+
+    protected function validateDigest($digest, $nonce, $created, $secret, $salt)
     {
         //check whether timestamp is not in the future
         if($this->isTokenFromFuture($created))
@@ -89,7 +104,7 @@ class Provider implements AuthenticationProviderInterface
                 $created,
                 $secret
             ),
-            ""
+            $salt
         );
 
         return $digest === $expected;
