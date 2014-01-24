@@ -187,7 +187,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
                 $time,
                 'somesecret'
             ),
-            'somesalt'
+            ''
         );
 
         $digest_slash = $encoder->encodePassword(
@@ -197,15 +197,15 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
                 $time,
                 'somesecret'
             ),
-            'somesalt'
+            ''
         );
 
         return array(
-            array($digest, base64_encode('somenonce'), $time, 'somesecret', 'somesalt', true),
-            array($digest, base64_encode('somenonce'), $time, 'somewrongsecret', 'somesalt', false),
-            array($digest, base64_encode('somewrongnonce'), $time, 'somesecret', 'somesalt', false),
-            array($digest. '9', base64_encode('somenonce'), $time, 'somesecret', 'somesalt', false),
-            array($digest_slash, base64_encode('s/o/m/e/n/o/n/c/e'), $time, 'somesecret', 'somesalt', true)
+            array($digest, base64_encode('somenonce'), $time, 'somesecret', '', true),
+            array($digest, base64_encode('somenonce'), $time, 'somewrongsecret', '', false),
+            array($digest, base64_encode('somewrongnonce'), $time, 'somesecret', '', false),
+            array($digest. '9', base64_encode('somenonce'), $time, 'somesecret', '', false),
+            array($digest_slash, base64_encode('s/o/m/e/n/o/n/c/e'), $time, 'somesecret', '', true)
         );
     }
 
@@ -234,7 +234,6 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     public function authenticate()
     {
         $this->user->expects($this->once())->method('getPassword')->will($this->returnValue('somesecret'));
-        $this->user->expects($this->once())->method('getSalt')->will($this->returnValue('somesalt'));
         $this->user->expects($this->once())->method('getRoles')->will($this->returnValue(array()));
         $this->userProvider->expects($this->once())->method('loadUserByUsername')->will($this->returnValue($this->user));
 
@@ -252,7 +251,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
                 $time,
                 'somesecret'
             ),
-            'somesalt'
+            ''
         );
 
         $token = new Token();
