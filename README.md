@@ -31,9 +31,9 @@ public function registerBundles()
 
 ## Commands
 
-Delete expired nonces via the ``escape:wsseauthentication:nonces:delete`` command that ships with this bundle; it takes nonceDir and lifetime as (required) parameters.
+Delete expired nonces via the ``escape:wsseauthentication:nonces:delete`` command that ships with this bundle; it takes the firewall name as a (required) parameter.
 
-``php app/console --env=dev escape:wsseauthentication:nonces:delete /path/to/security/nonces 300``
+``php app/console --env=dev escape:wsseauthentication:nonces:delete wsse_secured``
 
 ## Usage example
 
@@ -49,9 +49,11 @@ firewalls:
             lifetime: 300 #lifetime of nonce
 ```
 
+...that's it! You can now start calling your API endpoints: generate a X-WSSE header (Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder) and add it to your request (cUrl).
+
 ## Advanced configuration
 
-### Specify custom digest algorithm
+### Specify a custom digest algorithm
 
 app/config/security.yml
 
@@ -67,7 +69,7 @@ firewalls:
                 iterations: 1
 ```
 
-### Specify custom nonce cache
+### Specify a custom nonce cache
 
 app/config/security.yml
 
