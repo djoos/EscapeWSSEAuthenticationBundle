@@ -49,7 +49,7 @@ class Provider implements AuthenticationProviderInterface
                 $token->getAttribute('nonce'),
                 $token->getAttribute('created'),
                 $this->getSecret($user),
-                $this->getSalt()
+                $this->getSalt($user)
            )
         )
         {
@@ -68,9 +68,9 @@ class Provider implements AuthenticationProviderInterface
         return $user->getPassword();
     }
 
-    protected function getSalt()
+    protected function getSalt(UserInterface $user)
     {
-        return "";
+        return $user->getSalt();
     }
 
     protected function validateDigest($digest, $nonce, $created, $secret, $salt)
