@@ -39,8 +39,10 @@ class Listener implements ListenerInterface
         $request = $event->getRequest();
 
         //find out if the current request contains any information by which the user might be authenticated
-        if(!$request->headers->has('X-WSSE'))
+        if(!$request->headers->has('X-WSSE')) 
         {
+            //no WSSE header => not authenticated
+            $event->setResponse($this->authenticationEntryPoint->start($request, new AuthenticationException()));
             return;
         }
 
@@ -48,32 +50,36 @@ class Listener implements ListenerInterface
         $this->wsseHeader = $request->headers->get('X-WSSE');
         $wsseHeaderInfo = $this->parseHeader();
 
-        if($wsseHeaderInfo !== false)
+        if ($wsseHeaderInfo === false) 
         {
-            $token = new Token();
-            $token->setUser($wsseHeaderInfo['Username']);
+            //malformed WSSE header => not authenticated
+            $event->setResponse($this->authenticationEntryPoint->start($request, new AuthenticationException()));
+            return;
+        }
+        
+        $token = new Token();
+        $token->setUser($wsseHeaderInfo['Username']);
 
-            $token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
-            $token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
-            $token->setAttribute('created', $wsseHeaderInfo['Created']);
+        $token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
+        $token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
+        $token->setAttribute('created', $wsseHeaderInfo['Created']);
 
-            try
+        try
+        {
+            $returnValue = $this->authenticationManager->authenticate($token);
+
+            if($returnValue instanceof TokenInterface)
             {
-                $returnValue = $this->authenticationManager->authenticate($token);
-
-                if($returnValue instanceof TokenInterface)
-                {
-                    return $this->securityContext->setToken($returnValue);
-                }
-                else if($returnValue instanceof Response)
-                {
-                    return $event->setResponse($returnValue);
-                }
+                return $this->securityContext->setToken($returnValue);
             }
-            catch(AuthenticationException $ae)
+            else if($returnValue instanceof Response)
             {
-                $event->setResponse($this->authenticationEntryPoint->start($request, $ae));
+                return $event->setResponse($returnValue);
             }
+        }
+        catch(AuthenticationException $ae)
+        {
+            $event->setResponse($this->authenticationEntryPoint->start($request, $ae));
         }
     }
 
