@@ -48,7 +48,8 @@ firewalls:
             profile: "UsernameToken" #WSSE profile (WWW-Authenticate)
 ```
 
-...that's it! Your firewall is secured via WSSE Authentication and you can now start calling your API endpoints: generate a X-WSSE header (Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder) and add it to your request (cUrl).
+...that's it! Your "wsse_secured"-firewall is now secured via the (out-of-the-box) WSSE Authentication setup. You can now start calling your API endpoints: generate a X-WSSE header (Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder) and add it to your request (cUrl).
+It is strongly recommended to have a read through the more advanced configuration below once you're up and running with the basics...
 
 ## Advanced configuration
 
@@ -80,7 +81,7 @@ firewalls:
 
 ### Specify a custom digest algorithm, default: base 64-encoded sha1 with 1 iteration
 
-!!! I strongly suggest to change the digest algorithm to a stronger one than the default one
+!!! please do change the digest algorithm to a stronger one than the default one !!!
 
 app/config/security.yml
 
