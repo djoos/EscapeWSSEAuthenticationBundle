@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProvid
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -21,6 +22,7 @@ class Provider implements AuthenticationProviderInterface
     private $encoder;
     private $nonceCache;
     private $lifetime;
+    private $dateFormat;
 
     /**
      * Constructor.
@@ -29,13 +31,21 @@ class Provider implements AuthenticationProviderInterface
      * @param PasswordEncoderInterface $encoder                   A PasswordEncoderInterface instance
      * @param Cache                    $nonceCache                The nonce cache
      * @param int                      $lifetime                  The lifetime
+     * @param string                   $dateFormat                The date format
     */
-    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder, Cache $nonceCache, $lifetime=300)
+    public function __construct(
+        UserProviderInterface $userProvider,
+        PasswordEncoderInterface $encoder,
+        Cache $nonceCache,
+        $lifetime=300,
+        $dateFormat='/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
+    )
     {
         $this->userProvider = $userProvider;
         $this->encoder = $encoder;
         $this->nonceCache = $nonceCache;
         $this->lifetime = $lifetime;
+        $this->dateFormat = $dateFormat;
     }
 
     public function authenticate(TokenInterface $token)
@@ -75,10 +85,16 @@ class Provider implements AuthenticationProviderInterface
 
     protected function validateDigest($digest, $nonce, $created, $secret, $salt)
     {
+        //check whether timestamp is formatted correctly
+        if(!$this->isFormattedCorrectly($created))
+        {
+            throw new BadCredentialsException('Incorrectly formatted "created" in token.');
+        }
+
         //check whether timestamp is not in the future
         if($this->isTokenFromFuture($created))
         {
-            throw new CredentialsExpiredException('Future token detected.');
+            throw new BadCredentialsException('Future token detected.');
         }
 
         //expire timestamp after specified lifetime
@@ -115,6 +131,11 @@ class Provider implements AuthenticationProviderInterface
         return strtotime($created) > time();
     }
 
+    protected function isFormattedCorrectly($created)
+    {
+        return preg_match($this->getDateFormat(), $created);
+    }
+
     public function getUserProvider()
     {
         return $this->userProvider;
@@ -133,6 +154,11 @@ class Provider implements AuthenticationProviderInterface
     public function getLifetime()
     {
         return $this->lifetime;
+    }
+
+    public function getDateFormat()
+    {
+        return $this->dateFormat;
     }
 
     public function supports(TokenInterface $token)

@@ -35,7 +35,7 @@ Delete expired nonces via the ``escape:wsseauthentication:nonces:delete`` comman
 
 ``php app/console --env=dev escape:wsseauthentication:nonces:delete wsse_secured``
 
-## Usage example
+## Quick usage example
 
 app/config/security.yml
 
@@ -44,16 +44,43 @@ firewalls:
     wsse_secured:
         pattern:   ^/api/.*
         wsse:
-            realm: "Secured API" #identifies the set of resources to which the authentication information will apply (WWW-Authenticate)
+            realm: "Secured with WSSE" #identifies the set of resources to which the authentication information will apply (WWW-Authenticate)
             profile: "UsernameToken" #WSSE profile (WWW-Authenticate)
-            lifetime: 300 #lifetime of nonce
 ```
 
-...that's it! You can now start calling your API endpoints: generate a X-WSSE header (Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder) and add it to your request (cUrl).
+...that's it! Your firewall is secured via WSSE Authentication and you can now start calling your API endpoints: generate a X-WSSE header (Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder) and add it to your request (cUrl).
 
 ## Advanced configuration
 
-### Specify a custom digest algorithm
+### Specify a custom token lifetime, default: 300
+
+app/config/security.yml
+
+```
+firewalls:
+    wsse_secured:
+        #...
+        wsse:
+            #...
+            lifetime: 300
+```
+
+### Specify a custom date format, default: see regular expression below for ISO8601 (check out http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/)
+
+app/config/security.yml
+
+```
+firewalls:
+    wsse_secured:
+        #...
+        wsse:
+            #...
+            date_format: '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
+```
+
+### Specify a custom digest algorithm, default: base 64-encoded sha1 with 1 iteration
+
+!!! I strongly suggest to change the digest algorithm to a stronger one than the default one
 
 app/config/security.yml
 
@@ -69,7 +96,7 @@ firewalls:
                 iterations: 1
 ```
 
-### Specify a custom nonce cache
+### Specify a custom nonce cache, default: Doctrine\Common\Cache\PhpFileCache in %kernel.cache_dir%/security/nonces
 
 app/config/security.yml
 
@@ -78,7 +105,7 @@ services:
     #...
     cache_nonces:
         class: Doctrine\Common\Cache\PhpFileCache
-        arguments: [%kernel.cache_dir%/path/to/nonces]
+        arguments: [%kernel.cache_dir%/security/nonces]
 ```
 
 app/config/security.yml

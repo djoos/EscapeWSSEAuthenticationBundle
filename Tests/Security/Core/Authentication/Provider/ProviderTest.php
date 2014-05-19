@@ -108,9 +108,9 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     public function validateDigestExpireTime()
     {
         $provider = new CustomProvider($this->userProvider, $this->encoder, $this->nonceCache);
-        $provider->validateDigest(null, null, date('r', (time() - 86400)), null, null);
+        $provider->validateDigest(null, null, date(DATE_ISO8601, (time() - 86400)), null, null);
     }
-    
+
     /**
      * @test
      * @dataProvider providerValidateDigest
@@ -176,7 +176,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     //data provider
     public function providerValidateDigest()
     {
-        $time = date('Y-m-d H:i:s');
+        $time = date(DATE_ISO8601);
 
         $encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
 
@@ -243,7 +243,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $expected->setUser($this->user);
         $expected->setAuthenticated(true);
 
-        $time = date('Y-m-d H:i:s');
+        $time = date(DATE_ISO8601);
 
         $encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $digest = $encoder->encodePassword(

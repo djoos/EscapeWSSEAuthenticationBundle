@@ -52,7 +52,8 @@ class Factory implements SecurityFactoryInterface
             ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(1, new Reference($this->encoderId))
             ->replaceArgument(2, new Reference($this->nonceCacheId))
-            ->replaceArgument(3, $config['lifetime']);
+            ->replaceArgument(3, $config['lifetime'])
+            ->replaceArgument(4, $config['date_format']);
 
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
 
@@ -92,6 +93,9 @@ class Factory implements SecurityFactoryInterface
                 ->scalarNode('realm')->defaultValue(null)->end()
                 ->scalarNode('profile')->defaultValue('UsernameToken')->end()
                 ->scalarNode('lifetime')->defaultValue(300)->end()
+                ->scalarNode('date_format')->defaultValue(
+                    '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
+                )->end()
                 ->arrayNode('encoder')
                     ->children()
                         ->scalarNode('algorithm')->end()
