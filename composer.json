@@ -23,12 +23,12 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.2",
+        "symfony/framework-bundle": "~2.3",
+        "symfony/security-bundle": "~2.3",
         "doctrine/common": "~2.2"
     },
     "require-dev": {
-        "symfony/framework-bundle": "2.3.*",
-        "symfony/security-bundle": "2.3.*",
-        "symfony/finder": "2.3.*@dev"
+        "symfony/finder": "~2.3"
     },
     "autoload": {
         "psr-0": { "Escape\\WSSEAuthenticationBundle": "" }
