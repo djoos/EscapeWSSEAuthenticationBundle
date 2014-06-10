@@ -97,8 +97,10 @@ class Provider implements AuthenticationProviderInterface
             throw new BadCredentialsException('Future token detected.');
         }
 
+        $currentTime = gmdate('Y-m-d\TH:i:s\Z');
+
         //expire timestamp after specified lifetime
-        if(time() - strtotime($created) > $this->lifetime)
+        if(strtotime($currentTime) - strtotime($created) > $this->lifetime)
         {
             throw new CredentialsExpiredException('Token has expired.');
         }
