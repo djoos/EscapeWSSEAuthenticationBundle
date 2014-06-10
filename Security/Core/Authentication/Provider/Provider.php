@@ -97,10 +97,8 @@ class Provider implements AuthenticationProviderInterface
             throw new BadCredentialsException('Future token detected.');
         }
 
-        $currentTime = gmdate('Y-m-d\TH:i:s\Z');
-
         //expire timestamp after specified lifetime
-        if(strtotime($currentTime) - strtotime($created) > $this->lifetime)
+        if(strtotime($this->getCurrentTime()) - strtotime($created) > $this->lifetime)
         {
             throw new CredentialsExpiredException('Token has expired.');
         }
@@ -112,7 +110,7 @@ class Provider implements AuthenticationProviderInterface
             throw new NonceExpiredException('Previously used nonce detected.');
         }
 
-        $this->nonceCache->save($nonce, time(), $this->lifetime);
+        $this->nonceCache->save($nonce, strtotime($this->getCurrentTime()), $this->lifetime);
 
         //validate secret
         $expected = $this->encoder->encodePassword(
@@ -128,9 +126,14 @@ class Provider implements AuthenticationProviderInterface
         return $digest === $expected;
     }
 
+    protected function getCurrentTime()
+    {
+        return gmdate(DATE_ISO8601);
+    }
+
     protected function isTokenFromFuture($created)
     {
-        return strtotime($created) > time();
+        return strtotime($created) > strtotime($this->getCurrentTime());
     }
 
     protected function isFormattedCorrectly($created)
