@@ -2,8 +2,6 @@
 
 namespace Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
-
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -12,6 +10,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Doctrine\Common\Cache\Cache;
@@ -19,6 +18,7 @@ use Doctrine\Common\Cache\Cache;
 class Provider implements AuthenticationProviderInterface
 {
     private $userProvider;
+    private $providerKey;
     private $encoder;
     private $nonceCache;
     private $lifetime;
@@ -35,13 +35,20 @@ class Provider implements AuthenticationProviderInterface
     */
     public function __construct(
         UserProviderInterface $userProvider,
+        $providerKey,
         PasswordEncoderInterface $encoder,
         Cache $nonceCache,
         $lifetime=300,
         $dateFormat='/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
     )
     {
+        if(empty($providerKey))
+        {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        }
+
         $this->userProvider = $userProvider;
+        $this->providerKey = $providerKey;
         $this->encoder = $encoder;
         $this->nonceCache = $nonceCache;
         $this->lifetime = $lifetime;
@@ -55,7 +62,7 @@ class Provider implements AuthenticationProviderInterface
         if(
             $user &&
             $this->validateDigest(
-                $token->getAttribute('digest'),
+                $token->getCredentials(),
                 $token->getAttribute('nonce'),
                 $token->getAttribute('created'),
                 $this->getSecret($user),
@@ -63,9 +70,12 @@ class Provider implements AuthenticationProviderInterface
            )
         )
         {
-            $authenticatedToken = new Token($user->getRoles());
-            $authenticatedToken->setUser($user);
-            $authenticatedToken->setAuthenticated(true);
+            $authenticatedToken = new Token(
+                $user,
+                $token->getCredentials(),
+                $this->providerKey,
+                $user->getRoles()
+            );
 
             return $authenticatedToken;
         }
@@ -168,6 +178,6 @@ class Provider implements AuthenticationProviderInterface
 
     public function supports(TokenInterface $token)
     {
-        return $token instanceof Token;
+        return $token instanceof Token && $this->providerKey === $token->getProviderKey();
     }
 }

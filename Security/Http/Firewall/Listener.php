@@ -2,8 +2,6 @@
 
 namespace Escape\WSSEAuthenticationBundle\Security\Http\Firewall;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
-
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
@@ -12,25 +10,47 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 
 use UnexpectedValueException;
 
 class Listener implements ListenerInterface
 {
+    /**
+     * @var string WSSE header
+     */
     private $wsseHeader;
 
+    /**
+     * @var SecurityContextInterface
+     */
     protected $securityContext;
+
+    /**
+     * @var AuthenticationManagerInterface
+     */
     protected $authenticationManager;
+
+    /**
+     * @var string Uniquely identifies the secured area
+     */
+    protected $providerKey;
+
+    /**
+     * @var AuthenticationEntryPointInterface
+     */
     protected $authenticationEntryPoint;
 
     public function __construct(
         SecurityContextInterface $securityContext,
         AuthenticationManagerInterface $authenticationManager,
+        $providerKey,
         AuthenticationEntryPointInterface $authenticationEntryPoint
     )
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
+        $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
     }
 
@@ -50,10 +70,12 @@ class Listener implements ListenerInterface
 
         if($wsseHeaderInfo !== false)
         {
-            $token = new Token();
-            $token->setUser($wsseHeaderInfo['Username']);
+            $token = new Token(
+                $wsseHeaderInfo['Username'],
+                $wsseHeaderInfo['PasswordDigest'],
+                $this->providerKey
+            );
 
-            $token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
             $token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
             $token->setAttribute('created', $wsseHeaderInfo['Created']);
 

@@ -120,6 +120,23 @@ firewalls:
             nonce_cache_service_id: cache_nonces
 ```
 
+### Use multiple providers
+
+app/config/security.yml
+
+```
+firewalls:
+    wsse_secured_by_provider_one:
+        provider: provider_one
+        wsse:
+            #...
+
+    wsse_secured_by_provider_two:
+        provider: provider_two
+        wsse:
+            #...
+```
+
 ### Specify custom authentication class(es)
 
 app/config/config.yml

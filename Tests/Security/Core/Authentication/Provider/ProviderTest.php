@@ -3,7 +3,7 @@
 namespace Escape\WSSEAuthenticationBundle\Tests\Security\Core\Authentication\Provider;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -24,6 +24,7 @@ class CustomProvider extends Provider
 class ProviderTest extends \PHPUnit_Framework_TestCase
 {
     private $userProvider;
+    private $providerKey;
     private $encoder;
     private $user;
     private $nonceCache;
@@ -69,6 +70,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+        $this->providerKey = 'someproviderkey';
         $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $this->nonceCache = new PhpFileCache(self::$nonceDir);
         $this->user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
@@ -84,7 +86,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function supports($token, $expected)
     {
-        $provider = new Provider($this->userProvider, $this->encoder, $this->nonceCache);
+        $provider = new Provider($this->userProvider, 'someproviderkey', $this->encoder, $this->nonceCache);
         $this->assertEquals($expected, $provider->supports($token));
     }
 
@@ -92,7 +94,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     public function providerSupports()
     {
         return array(
-            array(new Token(), true),
+            array(new Token('someuser', 'somepassword', 'someproviderkey'), true),
             array($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'), false)
         );
     }
@@ -107,7 +109,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestExpireTime()
     {
-        $provider = new CustomProvider($this->userProvider, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $provider->validateDigest(null, null, date(DATE_ISO8601, (time() - 86400)), null, null);
     }
 
@@ -121,7 +123,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithoutNonceDir($digest, $nonce, $created, $secret, $salt, $expected)
     {
-        $provider = new CustomProvider($this->userProvider, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $result = $provider->validateDigest($digest, $nonce, $created, $secret, $salt);
         $this->assertEquals($expected, $result);
     }
@@ -136,7 +138,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithNonceDir($digest, $nonce, $created, $secret, $salt, $expected)
     {
-        $provider = new CustomProvider($this->userProvider, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $result = $provider->validateDigest($digest, $nonce, $created, $secret, $salt);
         $this->assertEquals($expected, $result);
 
@@ -164,7 +166,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithNonceDirExpectedException($digest, $nonce, $created, $secret, $salt, $expected)
     {
-        $provider = new CustomProvider($this->userProvider, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
 
         $this->nonceCache->save($nonce, time() - 123, 0);
 
@@ -221,8 +223,8 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function authenticateExpectedException()
     {
-        $provider = new CustomProvider($this->userProvider, $this->encoder, $this->nonceCache);
-        $provider->authenticate(new Token());
+        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
+        $provider->authenticate(new Token($this->user, '', $this->providerKey));
     }
 
     /**
@@ -239,13 +241,9 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $this->user->expects($this->once())->method('getRoles')->will($this->returnValue(array()));
         $this->userProvider->expects($this->once())->method('loadUserByUsername')->will($this->returnValue($this->user));
 
-        $expected = new Token();
-        $expected->setUser($this->user);
-        $expected->setAuthenticated(true);
-
+        $encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $time = date(DATE_ISO8601);
 
-        $encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $digest = $encoder->encodePassword(
             sprintf(
                 '%s%s%s',
@@ -256,12 +254,25 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
             'somesalt'
         );
 
-        $token = new Token();
-        $token->setAttribute('digest', $digest);
+        $expected = new Token($this->user, $digest, $this->providerKey);
+
+        $time = date(DATE_ISO8601);
+
+        $digest = $encoder->encodePassword(
+            sprintf(
+                '%s%s%s',
+                'somenonce',
+                $time,
+                'somesecret'
+            ),
+            'somesalt'
+        );
+
+        $token = new Token($this->user, $digest, $this->providerKey);
         $token->setAttribute('nonce', base64_encode('somenonce'));
         $token->setAttribute('created', $time);
 
-        $provider = new CustomProvider($this->userProvider, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $result = $provider->authenticate($token);
 
         $this->assertEquals($expected, $result);

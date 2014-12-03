@@ -3,7 +3,7 @@
 namespace Escape\WSSEAuthenticationBundle\Tests\Security\Http\Firewall;
 
 use Escape\WSSEAuthenticationBundle\Security\Http\Firewall\Listener;
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -49,16 +49,16 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function handleReturnToken()
     {
-        $token = new Token();
-        $token->setUser('admin');
-        $token->setAttribute('digest','admin');
-        $token->setAttribute('nonce','admin');
+        $token = new Token('someuser', 'somedigest', 'someproviderkey');
+        $token->setAttribute('nonce','somenonce');
         $token->setAttribute('created','2010-12-12 20:00:00');
+
         $tokenMock2 = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($tokenMock2));
         $this->securityContext->expects($this->once())->method('setToken')->with($tokenMock2);
-        $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="admin", PasswordDigest="admin", Nonce="admin", Created="2010-12-12 20:00:00"'));
-        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->authenticationEntryPoint);
+        $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="someuser", PasswordDigest="somedigest", Nonce="somenonce", Created="2010-12-12 20:00:00"'));
+
+        $listener = new Listener($this->securityContext, $this->authenticationManager, 'someproviderkey', $this->authenticationEntryPoint);
         $listener->handle($this->responseEvent);
     }
 
@@ -67,16 +67,16 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function handleReturnResponse()
     {
-        $token = new Token();
-        $token->setUser('admin');
-        $token->setAttribute('digest','admin');
-        $token->setAttribute('nonce','admin');
+        $token = new Token('someuser', 'somedigest', 'someproviderkey');
+        $token->setAttribute('nonce','somenonce');
         $token->setAttribute('created','2010-12-12 20:00:00');
+
         $response = new Response();
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($response));
         $this->responseEvent->expects($this->once())->method('setResponse')->with($response);
-        $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="admin", PasswordDigest="admin", Nonce="admin", Created="2010-12-12 20:00:00"'));
-        $listener = new Listener($this->securityContext, $this->authenticationManager, $this->authenticationEntryPoint);
+        $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="someuser", PasswordDigest="somedigest", Nonce="somenonce", Created="2010-12-12 20:00:00"'));
+
+        $listener = new Listener($this->securityContext, $this->authenticationManager, 'someproviderkey', $this->authenticationEntryPoint);
         $listener->handle($this->responseEvent);
     }
 }
