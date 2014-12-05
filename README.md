@@ -120,29 +120,25 @@ firewalls:
             nonce_cache_service_id: cache_nonces
 ```
 
-
-### Use a specific user provider for WSSE
+### Make use of a specific user provider on a firewall with WSSE as one of multiple authentication mechanisms
 
 app/config/security.yml
 
 ```
 providers:
-    user_db:
+    users:
         #...
     wsse_users:
         memory:
             users:
-                user1:  { password: 'secret' }
+                - { name: 'someuser', password: 'somesecret' }
 
 firewalls:
-    #...
-    wsse_secured:
-        provider: user_db
-        http_basic:
-            #...
+    secured:
+        provider: users
         wsse:
             #...
-            provider: wsse_users
+            provider: wsse_users #don't make use of firewall's "users"-provider, but "wsse_users"-provider for WSSE
 ```
 
 ### Specify custom authentication class(es)
