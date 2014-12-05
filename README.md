@@ -120,6 +120,29 @@ firewalls:
             nonce_cache_service_id: cache_nonces
 ```
 
+### Use multiple providers
+
+app/config/security.yml
+
+```
+providers:
+    provider_one:
+        #...
+    provider_two:
+        #...
+
+firewalls:
+    wsse_secured_by_provider_one:
+        provider: provider_one
+        wsse:
+            #...
+
+    wsse_secured_by_provider_two:
+        provider: provider_two
+        wsse:
+            #...
+```
+
 ### Make use of a specific user provider on a firewall with WSSE as one of multiple authentication mechanisms
 
 app/config/security.yml
