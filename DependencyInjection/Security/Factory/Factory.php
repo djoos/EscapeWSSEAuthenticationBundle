@@ -90,6 +90,7 @@ class Factory implements SecurityFactoryInterface
     {
         $node
             ->children()
+                ->scalarNode('provider')->end()
                 ->scalarNode('realm')->defaultValue(null)->end()
                 ->scalarNode('profile')->defaultValue('UsernameToken')->end()
                 ->scalarNode('lifetime')->defaultValue(300)->end()
