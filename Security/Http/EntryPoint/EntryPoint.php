@@ -31,7 +31,7 @@ class EntryPoint implements AuthenticationEntryPointInterface
         {
             if($ae instanceof AuthenticationException)
             {
-                $this->logger->debug($ae->getMessage());
+                $this->logger->warn($ae->getMessage());
             }
         }
 
