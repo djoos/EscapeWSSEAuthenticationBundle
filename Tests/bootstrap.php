@@ -8,3 +8,6 @@ if(!file_exists($file))
 }
 
 require_once $file;
+
+// disable the deprecation warnings
+PHPUnit_Framework_Error_Deprecated::$enabled = FALSE;
