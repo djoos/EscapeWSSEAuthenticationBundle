@@ -131,7 +131,7 @@ class Provider implements AuthenticationProviderInterface
                 $created,
                 $secret
             ),
-            $salt
+            null
         );
 
         return StringUtils::equals($expected, $digest);
