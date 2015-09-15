@@ -60,6 +60,14 @@ class Provider implements AuthenticationProviderInterface
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
         if(
+            !$token->hasAttribute('nonce') ||
+            !$token->hasAttribute('created')
+          )
+        {
+            throw new AuthenticationException('WSSE authentication failed.');
+        }
+
+        if(
             $user &&
             $this->validateDigest(
                 $token->getCredentials(),
