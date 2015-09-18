@@ -20,7 +20,6 @@
     <target name="vendor" description="Load composer repositories" depends="composer">
         <exec executable="composer" failonerror="true">
             <arg value="install" />
-            <arg value="--dev" />
         </exec>
     </target>
 
@@ -116,7 +115,7 @@
     <target name="phpcs" description="Find coding standard violations using PHP Code Sniffer">
         <exec executable="phpcs">
             <arg value="--standard=${phpcs.standard}" />
-            <arg value="--ignore=vendor/*" /> 
+            <arg value="--ignore=vendor/*" />
             <arg path="${basedir}" />
         </exec>
     </target>
