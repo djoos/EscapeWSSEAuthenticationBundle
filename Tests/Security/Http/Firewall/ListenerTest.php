@@ -39,7 +39,15 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $this->responseEvent = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
         $this->request = $this->getMockForAbstractClass('Symfony\Component\HttpFoundation\Request');
         $this->responseEvent->expects($this->once())->method('getRequest')->will($this->returnValue($this->request));
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+
+        if (interface_exists('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')) {
+            // TokenStorageInterface for SF >=2.7
+            $this->securityContext = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        } else {
+            // SecurityContextInterface for SF <2.6
+            $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        }
+
         $this->authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
         $this->authenticationEntryPoint = $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
     }
