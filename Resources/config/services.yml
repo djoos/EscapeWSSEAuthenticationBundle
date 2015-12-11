@@ -7,11 +7,11 @@ services:
         class:  %escape_wsse_authentication.listener.class%
         arguments:
           - null # replaced by @security.token_storage for SF >= 2.6, @security.context otherwise
-          - @security.authentication.manager
+          - '@security.authentication.manager'
 
     escape_wsse_authentication.entry_point:
         class:  %escape_wsse_authentication.entry_point.class%
-        arguments: [@logger, null, "UsernameToken"]
+        arguments: ['@logger', null, 'UsernameToken']
 
     escape_wsse_authentication.encoder:
         class:  %escape_wsse_authentication.encoder.class%
