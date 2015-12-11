@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class EntryPoint implements AuthenticationEntryPointInterface
 {
@@ -31,7 +31,7 @@ class EntryPoint implements AuthenticationEntryPointInterface
         {
             if($ae instanceof AuthenticationException)
             {
-                $this->logger->warn($ae->getMessage());
+                $this->logger->warning($ae->getMessage());
             }
         }
 

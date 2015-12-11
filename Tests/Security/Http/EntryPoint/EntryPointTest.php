@@ -10,9 +10,9 @@ class EntryPointTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if(!interface_exists('Symfony\Component\HttpKernel\Log\LoggerInterface'))
+        if(!interface_exists('Psr\Log\LoggerInterface'))
         {
-            $this->markTestSkipped('The "HttpKernel" component is not available');
+            $this->markTestSkipped('Interface "Psr\Log\LoggerInterface" is not available');
         }
 
         if(!class_exists('Symfony\Component\HttpFoundation\Request'))
@@ -23,7 +23,7 @@ class EntryPointTest extends \PHPUnit_Framework_TestCase
 
     public function testStart()
     {
-        $logger = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $realm = 'TheRealm';
         $profile = 'TheProfile';
@@ -47,7 +47,7 @@ class EntryPointTest extends \PHPUnit_Framework_TestCase
 
     public function testStartWithNoException()
     {
-        $logger = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $realm = 'TheRealm';
         $profile = 'TheProfile';
