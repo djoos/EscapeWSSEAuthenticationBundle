@@ -3,6 +3,7 @@
 namespace Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -63,6 +64,20 @@ class Provider implements AuthenticationProviderInterface
         }
 
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
+
+        if ($user instanceof AdvancedUserInterface) {
+            if (!$user->isEnabled()) {
+                throw new AuthenticationException('WSSE authentication failed.');
+            }
+        }
+
+        if(
+            !$token->hasAttribute('nonce') ||
+            !$token->hasAttribute('created')
+          )
+        {
+            throw new AuthenticationException('WSSE authentication failed.');
+        }
 
         if(
             $user &&
