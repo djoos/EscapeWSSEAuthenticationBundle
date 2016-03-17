@@ -13,7 +13,6 @@ use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Util\StringUtils;
 
 use Doctrine\Common\Cache\Cache;
 
@@ -145,7 +144,11 @@ class Provider implements AuthenticationProviderInterface
             $salt
         );
 
-        return StringUtils::equals($expected, $digest);
+        if (class_exists('Symfony\Component\Security\Core\Util\StringUtils')) {
+            return \Symfony\Component\Security\Core\Util\StringUtils::equals($expected, $digest);
+        } else {
+            return hash_equals($expected, $digest);
+        }
     }
 
     protected function getCurrentTime()
