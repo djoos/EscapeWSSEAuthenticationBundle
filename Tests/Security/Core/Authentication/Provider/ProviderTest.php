@@ -23,6 +23,7 @@ class CustomProvider extends Provider
 
 class ProviderTest extends \PHPUnit_Framework_TestCase
 {
+    private $userChecker;
     private $userProvider;
     private $providerKey;
     private $encoder;
@@ -69,6 +70,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->providerKey = 'someproviderkey';
         $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
@@ -86,7 +88,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function supports($token, $expected)
     {
-        $provider = new Provider($this->userProvider, 'someproviderkey', $this->encoder, $this->nonceCache);
+        $provider = new Provider($this->userChecker, $this->userProvider, 'someproviderkey', $this->encoder, $this->nonceCache);
         $this->assertEquals($expected, $provider->supports($token));
     }
 
@@ -109,7 +111,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestExpireTime()
     {
-        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userChecker, $this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $provider->validateDigest(null, null, date(DATE_ISO8601, (time() - 86400)), null, null);
     }
 
@@ -123,7 +125,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithoutNonceDir($digest, $nonce, $created, $secret, $salt, $expected)
     {
-        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userChecker, $this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $result = $provider->validateDigest($digest, $nonce, $created, $secret, $salt);
         $this->assertEquals($expected, $result);
     }
@@ -138,7 +140,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithNonceDir($digest, $nonce, $created, $secret, $salt, $expected)
     {
-        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userChecker, $this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $result = $provider->validateDigest($digest, $nonce, $created, $secret, $salt);
         $this->assertEquals($expected, $result);
 
@@ -166,7 +168,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function validateDigestWithNonceDirExpectedException($digest, $nonce, $created, $secret, $salt, $expected)
     {
-        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userChecker, $this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
 
         $this->nonceCache->save($nonce, time() - 123, 0);
 
@@ -223,7 +225,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function authenticateExpectedException()
     {
-        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userChecker, $this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $provider->authenticate(new Token($this->user, '', $this->providerKey));
     }
 
@@ -272,7 +274,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $token->setAttribute('nonce', base64_encode('somenonce'));
         $token->setAttribute('created', $time);
 
-        $provider = new CustomProvider($this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
+        $provider = new CustomProvider($this->userChecker, $this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
         $result = $provider->authenticate($token);
 
         $this->assertEquals($expected, $result);

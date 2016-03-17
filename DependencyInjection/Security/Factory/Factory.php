@@ -49,12 +49,12 @@ class Factory implements SecurityFactoryInterface
 
         $container
             ->setDefinition($providerId, new DefinitionDecorator('escape_wsse_authentication.provider'))
-            ->replaceArgument(0, new Reference($userProviderId))
-            ->replaceArgument(1, $id)
-            ->replaceArgument(2, new Reference($this->encoderId))
-            ->replaceArgument(3, new Reference($this->nonceCacheId))
-            ->replaceArgument(4, $config['lifetime'])
-            ->replaceArgument(5, $config['date_format']);
+            ->replaceArgument(1, new Reference($userProviderId))
+            ->replaceArgument(2, $id)
+            ->replaceArgument(3, new Reference($this->encoderId))
+            ->replaceArgument(4, new Reference($this->nonceCacheId))
+            ->replaceArgument(5, $config['lifetime'])
+            ->replaceArgument(6, $config['date_format']);
 
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
 

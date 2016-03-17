@@ -103,12 +103,12 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $definition = $container->getDefinition('escape_wsse_authentication.provider.foo');
         $this->assertEquals(
             array(
-                'index_0' => new Reference('user_provider'),
-                'index_1' => 'foo',
-                'index_2' => new Reference($encoderId),
-                'index_3' => new Reference($nonceCacheId),
-                'index_4' => $lifetime,
-                'index_5' => $date_format
+                'index_1' => new Reference('user_provider'),
+                'index_2' => 'foo',
+                'index_3' => new Reference($encoderId),
+                'index_4' => new Reference($nonceCacheId),
+                'index_5' => $lifetime,
+                'index_6' => $date_format
             ),
             $definition->getArguments()
         );
