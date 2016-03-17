@@ -43,6 +43,7 @@ app/config/security.yml
 firewalls:
     wsse_secured:
         pattern:   ^/api/.*
+        stateless: true
         wsse:
             realm: "Secured with WSSE" #identifies the set of resources to which the authentication information will apply (WWW-Authenticate)
             profile: "UsernameToken" #WSSE profile (WWW-Authenticate)
