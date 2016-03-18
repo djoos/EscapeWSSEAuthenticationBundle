@@ -2,6 +2,10 @@ language: php
 
 sudo: false
 
+env:
+    global:
+        - SYMFONY_DEPRECATIONS_HELPER=weak
+
 cache:
     directories:
       - $HOME/.composer/cache
@@ -23,9 +27,9 @@ matrix:
     - php: 5.6
       env: SYMFONY_DEPS_VERSION=2.3
     - php: 5.6
-      env: SYMFONY_DEPS_VERSION=2.8
+      env: SYMFONY_DEPS_VERSION=2.8 SYMFONY_DEPRECATIONS_HELPER=strict
     - php: 5.6
-      env: SYMFONY_DEPS_VERSION=3.0
+      env: SYMFONY_DEPS_VERSION=3.0 SYMFONY_DEPRECATIONS_HELPER=strict
     - php: 7.0
     - php: hhvm
     - php: hhvm-nightly
