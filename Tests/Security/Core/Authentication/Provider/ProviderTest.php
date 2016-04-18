@@ -95,8 +95,15 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     //data provider
     public function providerSupports()
     {
+        $tokenWithoutAttributes = new Token('someuser', 'somepassword', 'someproviderkey');
+
+        $tokenWithAttributes = $tokenWithoutAttributes;
+        $tokenWithAttributes->setAttribute('nonce', base64_encode('somenonce'));
+        $tokenWithAttributes->setAttribute('created', date(DATE_ISO8601));
+
         return array(
-            array(new Token('someuser', 'somepassword', 'someproviderkey'), true),
+            array($tokenWithoutAttributes, false),
+            array($tokenWithAttributes, true),
             array($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'), false)
         );
     }
@@ -226,7 +233,12 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     public function authenticateExpectedException()
     {
         $provider = new CustomProvider($this->userChecker, $this->userProvider, $this->providerKey, $this->encoder, $this->nonceCache);
-        $provider->authenticate(new Token($this->user, '', $this->providerKey));
+
+        $token = new Token($this->user, '', $this->providerKey);
+        $token->setAttribute('nonce', base64_encode('somenonce'));
+        $token->setAttribute('created', date(DATE_ISO8601));
+
+        $provider->authenticate($token);
     }
 
     /**
