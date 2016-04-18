@@ -193,6 +193,6 @@ class Provider implements AuthenticationProviderInterface
 
     public function supports(TokenInterface $token)
     {
-        return $token instanceof Token && $this->providerKey === $token->getProviderKey();
+        return $token instanceof Token && $token->hasAttribute('nonce') && $token->hasAttribute('created') && $this->providerKey === $token->getProviderKey();
     }
 }
