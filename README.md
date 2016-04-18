@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/escapestudios/EscapeWSSEAuthenticationBundle.png)](http://travis-ci.org/escapestudios/EscapeWSSEAuthenticationBundle)
+[![Build Status](https://secure.travis-ci.org/djoos/EscapeWSSEAuthenticationBundle.png)](http://travis-ci.org/djoos/EscapeWSSEAuthenticationBundle)
 
 ## Introduction
 
@@ -11,7 +11,7 @@ composer.json
 ```
 "require": {
     ...
-    "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
+    "escapestudios/wsse-authentication-bundle": "~2.2",
     ...
 }
 ```
