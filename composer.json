@@ -3,16 +3,16 @@
     "type": "symfony-bundle",
     "description": "Symfony2 bundle to implement WSSE authentication",
     "keywords": ["wsse", "authentication", "bundle"],
-    "homepage": "https://github.com/escapestudios/EscapeWSSEAuthenticationBundle",
+    "homepage": "https://github.com/djoos/EscapeWSSEAuthenticationBundle",
     "license": "MIT",
     "authors": [
         {
             "name": "David Joos",
-            "email": "david@escapestudios.com"
+            "email": "david.joos@escapestudios.com"
         },
         {
             "name": "Community contributors",
-            "homepage": "https://github.com/escapestudios/EscapeWSSEAuthenticationBundle/graphs/contributors"
+            "homepage": "https://github.com/djoos/EscapeWSSEAuthenticationBundle/graphs/contributors"
         }
     ],
     "minimum-stability": "dev",
