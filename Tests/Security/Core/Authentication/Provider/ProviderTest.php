@@ -97,7 +97,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     {
         $tokenWithoutAttributes = new Token('someuser', 'somepassword', 'someproviderkey');
 
-        $tokenWithAttributes = $tokenWithoutAttributes;
+        $tokenWithAttributes = new Token('someuser', 'somepassword', 'someproviderkey');
         $tokenWithAttributes->setAttribute('nonce', base64_encode('somenonce'));
         $tokenWithAttributes->setAttribute('created', date(DATE_ISO8601));
 
