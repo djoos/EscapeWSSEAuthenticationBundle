@@ -25,6 +25,7 @@ class Provider implements AuthenticationProviderInterface
     private $nonceCache;
     private $lifetime;
     private $dateFormat;
+    private $clockSkew;
 
     /**
      * Constructor.
@@ -36,7 +37,8 @@ class Provider implements AuthenticationProviderInterface
      * @param Cache                    $nonceCache   The nonce cache
      * @param int                      $lifetime     The lifetime
      * @param string                   $dateFormat   The date format
-    */
+     * @param int                      $clockSkew    The margin in seconds to mitigate clock skew
+     */
     public function __construct(
         UserCheckerInterface $userChecker,
         UserProviderInterface $userProvider,
@@ -44,7 +46,8 @@ class Provider implements AuthenticationProviderInterface
         PasswordEncoderInterface $encoder,
         Cache $nonceCache,
         $lifetime=300,
-        $dateFormat='/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
+        $dateFormat='/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/',
+        $clockSkew = 60
     )
     {
         if(empty($providerKey))
@@ -59,6 +62,7 @@ class Provider implements AuthenticationProviderInterface
         $this->nonceCache = $nonceCache;
         $this->lifetime = $lifetime;
         $this->dateFormat = $dateFormat;
+        $this->clockSkew = $clockSkew;
     }
 
     public function authenticate(TokenInterface $token)
@@ -119,7 +123,7 @@ class Provider implements AuthenticationProviderInterface
         }
 
         //expire timestamp after specified lifetime
-        if(strtotime($this->getCurrentTime()) - strtotime($created) > $this->lifetime)
+        if(strtotime($this->getCurrentTime()) - strtotime($created) > ($this->lifetime - $this->clockSkew))
         {
             throw new CredentialsExpiredException('Token has expired.');
         }
@@ -158,7 +162,7 @@ class Provider implements AuthenticationProviderInterface
 
     protected function isTokenFromFuture($created)
     {
-        return strtotime($created) > strtotime($this->getCurrentTime());
+        return strtotime($created) - $this->clockSkew > strtotime($this->getCurrentTime());
     }
 
     protected function isFormattedCorrectly($created)
