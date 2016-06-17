@@ -123,7 +123,7 @@ class Provider implements AuthenticationProviderInterface
         }
 
         //expire timestamp after specified lifetime
-        if(strtotime($this->getCurrentTime()) - strtotime($created) > ($this->lifetime - $this->clockSkew))
+        if(strtotime($this->getCurrentTime()) - strtotime($created) > $this->lifetime)
         {
             throw new CredentialsExpiredException('Token has expired.');
         }
