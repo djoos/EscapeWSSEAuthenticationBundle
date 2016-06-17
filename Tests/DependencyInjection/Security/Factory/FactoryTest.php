@@ -110,7 +110,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
                 'index_3' => new Reference($encoderId),
                 'index_4' => new Reference($nonceCacheId),
                 'index_5' => $lifetime,
-                'index_6' => $date_format
+                'index_6' => $date_format,
+                'index_7' => $clock_skew
             ),
             $definition->getArguments()
         );
