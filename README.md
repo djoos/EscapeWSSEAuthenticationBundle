@@ -2,23 +2,29 @@
 
 ## Introduction
 
-The EscapeWSSEAuthentication bundle is a simple and easy way to implement WSSE authentication in Symfony2 applications
+The EscapeWSSEAuthentication bundle is a simple and easy way to implement WSSE authentication in Symfony applications
 
 ## Installation
 
-composer.json
+`Command Line`
 
+```sh
+composer require escapestudios/wsse-authentication-bundle
 ```
+
+`composer.json`
+
+```json
 "require": {
     ...
-    "escapestudios/wsse-authentication-bundle": "~2.2",
+    "escapestudios/wsse-authentication-bundle": "^2.2",
     ...
 }
 ```
 
-app/AppKernel.php
+`app/AppKernel.php`
 
-```
+```php
 public function registerBundles()
 {
     return array(
@@ -31,15 +37,15 @@ public function registerBundles()
 
 ## Commands
 
-Delete expired nonces via the ``escape:wsseauthentication:nonces:delete`` command that ships with this bundle; it takes the firewall name as a (required) parameter.
+Delete expired nonces via the `escape:wsseauthentication:nonces:delete` command that ships with this bundle; it takes the firewall name as a (required) parameter.
 
-``php app/console --env=dev escape:wsseauthentication:nonces:delete wsse_secured``
+`php app/console --env=dev escape:wsseauthentication:nonces:delete wsse_secured`
 
 ## Quick usage example
 
-app/config/security.yml
+`app/config/security.yml`
 
-```
+```yml
 firewalls:
     wsse_secured:
         pattern:   ^/api/.*
@@ -54,11 +60,13 @@ It is strongly recommended to have a read through the more advanced configuratio
 
 ## Advanced configuration
 
-### Specify a custom token lifetime, default: 300
+### Specify a custom token lifetime
 
-app/config/security.yml
+Default value: 300
 
-```
+`app/config/security.yml`
+
+```yml
 firewalls:
     wsse_secured:
         #...
@@ -67,11 +75,13 @@ firewalls:
             lifetime: 300
 ```
 
-### Specify a custom date format, default: see regular expression below for ISO8601 (check out http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/)
+### Specify a custom date format
 
-app/config/security.yml
+Default value: see regular expression below for ISO8601 ([check out](http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/))
 
-```
+`app/config/security.yml`
+
+```yml
 firewalls:
     wsse_secured:
         #...
@@ -80,13 +90,15 @@ firewalls:
             date_format: '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
 ```
 
-### Specify a custom digest algorithm, default: base 64-encoded sha1 with 1 iteration
+### Specify a custom digest algorithm
 
-!!! please do change the digest algorithm to a stronger one than the default one !!!
+Default value: base 64-encoded sha1 with 1 iteration
 
-app/config/security.yml
+:warning: Please change the digest algorithm to a stronger one, like bcrypt :warning:
 
-```
+`app/config/security.yml`
+
+```yml
 firewalls:
     wsse_secured:
         #...
@@ -98,11 +110,13 @@ firewalls:
                 iterations: 1
 ```
 
-### Specify a custom nonce cache, default: Doctrine\Common\Cache\PhpFileCache in %kernel.cache_dir%/security/nonces
+### Specify a custom nonce cache
 
-app/config/security.yml
+Default value: Doctrine\Common\Cache\PhpFileCache in %kernel.cache_dir%/security/nonces
 
-```
+`app/config/security.yml`
+
+```yml
 services:
     #...
     cache_nonces:
@@ -110,9 +124,9 @@ services:
         arguments: [%kernel.cache_dir%/security/nonces]
 ```
 
-app/config/security.yml
+`app/config/security.yml`
 
-```
+```yml
 firewalls:
     wsse_secured:
         #...
@@ -123,9 +137,9 @@ firewalls:
 
 ### Use multiple providers
 
-app/config/security.yml
+`app/config/security.yml`
 
-```
+```yml
 providers:
     provider_one:
         #...
@@ -146,9 +160,9 @@ firewalls:
 
 ### Make use of a specific user provider on a firewall with WSSE as one of multiple authentication mechanisms
 
-app/config/security.yml
+`app/config/security.yml`
 
-```
+```yml
 providers:
     users:
         #...
@@ -167,9 +181,9 @@ firewalls:
 
 ### Specify custom authentication class(es)
 
-app/config/config.yml
+`app/config/config.yml`
 
-```
+```yml
 # Escape WSSE authentication configuration
 escape_wsse_authentication:
     authentication_provider_class: Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider

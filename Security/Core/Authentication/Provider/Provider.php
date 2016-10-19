@@ -148,11 +148,7 @@ class Provider implements AuthenticationProviderInterface
             $salt
         );
 
-        if (class_exists('Symfony\Component\Security\Core\Util\StringUtils')) {
-            return \Symfony\Component\Security\Core\Util\StringUtils::equals($expected, $digest);
-        } else {
-            return hash_equals($expected, $digest);
-        }
+        return hash_equals($expected, $digest);
     }
 
     protected function getCurrentTime()
