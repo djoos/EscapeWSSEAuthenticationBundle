@@ -42,14 +42,14 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
 
         if (interface_exists('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')) {
             // TokenStorageInterface for SF >=2.7
-            $this->securityContext = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+            $this->securityContext = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         } else {
             // SecurityContextInterface for SF <2.6
-            $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+            $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         }
 
-        $this->authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-        $this->authenticationEntryPoint = $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
+        $this->authenticationManager = $this->createMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+        $this->authenticationEntryPoint = $this->createMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
     }
 
     /**
@@ -61,7 +61,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $token->setAttribute('nonce','somenonce');
         $token->setAttribute('created','2010-12-12 20:00:00');
 
-        $tokenMock2 = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $tokenMock2 = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $this->authenticationManager->expects($this->once())->method('authenticate')->with($token)->will($this->returnValue($tokenMock2));
         $this->securityContext->expects($this->once())->method('setToken')->with($tokenMock2);
         $this->request->headers->add(array('X-WSSE'=>'UsernameToken Username="someuser", PasswordDigest="somedigest", Nonce="somenonce", Created="2010-12-12 20:00:00"'));
