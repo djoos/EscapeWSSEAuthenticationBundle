@@ -17,14 +17,14 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.9",
-        "symfony/framework-bundle": "~2.3|~3.0",
-        "symfony/security-bundle": "~2.3|~3.0",
+        "php": ">=5.3.9 || ^7.0",
+        "symfony/framework-bundle": "~2.3 || ~3.0 || ^4.0",
+        "symfony/security-bundle": "~2.3 || ~3.0 || ^4.0",
         "doctrine/common": "~2.2"
     },
     "require-dev": {
-        "symfony/finder": "~2.3|~3.0",
-        "symfony/phpunit-bridge": "~2.7|~3.0"
+        "symfony/finder": "~2.3 || ~3.0",
+        "symfony/phpunit-bridge": "~2.7 || ~3.0 || ^4.0"
     },
     "autoload": {
         "psr-0": { "Escape\\WSSEAuthenticationBundle": "" }
