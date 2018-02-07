@@ -106,7 +106,7 @@ class Provider implements AuthenticationProviderInterface
     
     protected function isTokenExpired($created)
     {
-        return strtotime($this->getCurrentTime()) - strtotime($created) > $this->lifetime;
+        return ($this->lifetime == -1) ? false : strtotime($this->getCurrentTime()) - strtotime($created) > $this->lifetime;
     }
 
     protected function validateDigest($digest, $nonce, $created, $secret, $salt)
