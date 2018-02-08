@@ -23,8 +23,8 @@ class EntryPointTest extends \PHPUnit_Framework_TestCase
 
     public function testStart()
     {
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
+        $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
         $realm = 'TheRealm';
         $profile = 'TheProfile';
 
@@ -47,8 +47,8 @@ class EntryPointTest extends \PHPUnit_Framework_TestCase
 
     public function testStartWithNoException()
     {
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
+        $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
         $realm = 'TheRealm';
         $profile = 'TheProfile';
 

@@ -70,12 +70,12 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
-        $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+        $this->userChecker = $this->createMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
+        $this->userProvider = $this->createMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->providerKey = 'someproviderkey';
         $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $this->nonceCache = new PhpFileCache(self::$nonceDir);
-        $this->user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $this->user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
 
         $this->clearDir();
     }
@@ -104,7 +104,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         return array(
             array($tokenWithoutAttributes, false),
             array($tokenWithAttributes, true),
-            array($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'), false)
+            array($this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'), false)
         );
     }
 
