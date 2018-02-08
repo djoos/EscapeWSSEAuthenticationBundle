@@ -10,12 +10,12 @@ php:
     - nightly
 
 env:
-    - SYMFONY_VERSION=2.7.* # LTS (until 05/2019)
-    - SYMFONY_VERSION=2.8.* # LTS (until 11/2019)
-    - SYMFONY_VERSION=3.2.* # (until 01/2018)
-    - SYMFONY_VERSION=3.3.* # (until 07/2018)
-    - SYMFONY_VERSION=3.4.* # LTS (until 11/2021)
-    - SYMFONY_VERSION=4.0.* # (until 01/2019)
+    - SYMFONY_VERSION=2.7.* # LTS, EOL 05/2019
+    - SYMFONY_VERSION=2.8.* # LTS, EOL 11/2019
+    - SYMFONY_VERSION=3.2.* # EOL 01/2018
+    - SYMFONY_VERSION=3.3.* # EOL 07/2018
+    - SYMFONY_VERSION=3.4.* # LTS, EOL 11/2021
+    - SYMFONY_VERSION=4.0.* # EOL 01/2019
     - SYMFONY_VERSION=dev-master
     global:
         - SYMFONY_DEPRECATIONS_HELPER=weak
@@ -26,8 +26,8 @@ cache:
 
 before_install:
     - composer self-update
-    - if [ "$DEPENDENCIES" == "dev" ]; then perl -pi -e 's/^}$/,"minimum-stability":"dev"}/' composer.json; fi;
-    - if [ "$SYMFONY_VERSION" != "" ]; then composer --no-update require symfony/symfony:${SYMFONY_VERSION}; fi;
+    - sh -c "if [ '$DEPENDENCIES' == 'dev' ]; then sed -i 's/^}$/,"minimum-stability":"dev"}/' composer.json; fi"
+    - sh -c "if [ '$SYMFONY_VERSION' != '' ]; then composer require symfony/symfony:${SYMFONY_VERSION}; fi"
 
 install: composer install
 
