@@ -103,6 +103,11 @@ class Provider implements AuthenticationProviderInterface
     {
         return $user->getSalt();
     }
+    
+    protected function isTokenExpired($created)
+    {
+        return ($this->lifetime == -1) ? false : strtotime($this->getCurrentTime()) - strtotime($created) > $this->lifetime;
+    }
 
     protected function validateDigest($digest, $nonce, $created, $secret, $salt)
     {
@@ -119,7 +124,7 @@ class Provider implements AuthenticationProviderInterface
         }
 
         //expire timestamp after specified lifetime
-        if(strtotime($this->getCurrentTime()) - strtotime($created) > $this->lifetime)
+        if($this->isTokenExpired($created))
         {
             throw new CredentialsExpiredException('Token has expired.');
         }
