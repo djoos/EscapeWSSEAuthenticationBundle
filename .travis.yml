@@ -2,7 +2,21 @@ language: php
 
 sudo: false
 
+php:
+    - 5.6 # security support until 31/12/2018
+    - 7.0 # security support until 03/12/2018
+    - 7.1 # security support until 01/12/2019
+    - 7.2 # security support until 30/11/2020
+    - nightly
+
 env:
+    - SYMFONY_VERSION=2.7.* # LTS (until 05/2019)
+    - SYMFONY_VERSION=2.8.* # LTS (until 11/2019)
+    - SYMFONY_VERSION=3.2.* # (until 01/2018)
+    - SYMFONY_VERSION=3.3.* # (until 07/2018)
+    - SYMFONY_VERSION=3.4.* # LTS (until 11/2021)
+    - SYMFONY_VERSION=4.0.* # (until 01/2019)
+    - SYMFONY_VERSION=dev-master
     global:
         - SYMFONY_DEPRECATIONS_HELPER=weak
 
@@ -10,38 +24,17 @@ cache:
     directories:
       - $HOME/.composer/cache
 
-before_script:
-    # symfony/*
-    - sh -c "if [ '$SYMFONY_DEPS_VERSION' = '3.0' ]; then sed -i 's/~2\.3|~3\.0/3.0.*@dev/g' composer.json; composer update; fi"
-    - sh -c "if [ '$SYMFONY_DEPS_VERSION' = '2.8' ]; then sed -i 's/~2\.3|~3\.0/2.8.*@dev/g' composer.json; composer update; fi"
-    - sh -c "if [ '$SYMFONY_DEPS_VERSION' = '' ]; then sed -i 's/~2\.3|~3\.0/2.7.*@dev/g' composer.json; composer update; fi"
-    - sh -c "if [ '$SYMFONY_DEPS_VERSION' = '2.3' ]; then sed -i 's/~2\.3|~3\.0/2.3.*@dev/g' composer.json; composer update; fi"
-    - composer install
+before_install:
+    - composer self-update
+    - if [ "$DEPENDENCIES" == "dev" ]; then perl -pi -e 's/^}$/,"minimum-stability":"dev"}/' composer.json; fi;
+    - if [ "$SYMFONY_VERSION" != "" ]; then composer --no-update require symfony/symfony:${SYMFONY_VERSION}; fi;
 
-matrix:
-  include:
-    - php: 5.5
-    - php: 5.6
-    - php: 5.6
-      env: SYMFONY_DEPS_VERSION=2.3
-    - php: 5.6
-      env: SYMFONY_DEPS_VERSION=2.8 SYMFONY_DEPRECATIONS_HELPER=strict
-    - php: 5.6
-      env: SYMFONY_DEPS_VERSION=3.0 SYMFONY_DEPRECATIONS_HELPER=strict
-    - php: 7.0
-    - php: hhvm
-    - php: hhvm-nightly
-  allow_failures:
-    - php: hhvm
-    - php: hhvm-nightly
+install: composer install
 
 script:
     - ant test
 
-branches:
-  except:
-    - jenkins
-
-notifications:
-  email:
-    - dev@escapestudios.com
+matrix:
+  allow_failures:
+    - env: SYMFONY_VERSION=dev-master
+    - php: nightly
