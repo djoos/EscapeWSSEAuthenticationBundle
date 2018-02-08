@@ -72,7 +72,7 @@ firewalls:
         #...
         wsse:
             #...
-            lifetime: 300 (or -1 for no-expirable tokens)
+            lifetime: 300 # or -1 for infinite lifetime tokens (please use with extreme care!)
 ```
 
 ### Specify a custom date format
