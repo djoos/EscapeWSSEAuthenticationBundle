@@ -4,7 +4,7 @@ namespace Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 
@@ -17,7 +17,7 @@ class Factory implements SecurityFactoryInterface
     {
         $this->encoderId = 'escape_wsse_authentication.encoder.'.$id;
 
-        $container->setDefinition($this->encoderId, new DefinitionDecorator('escape_wsse_authentication.encoder'));
+        $container->setDefinition($this->encoderId, new ChildDefinition('escape_wsse_authentication.encoder'));
 
         if(isset($config['encoder']['algorithm']))
         {
@@ -42,13 +42,13 @@ class Factory implements SecurityFactoryInterface
         {
             $this->nonceCacheId = 'escape_wsse_authentication.nonce_cache.'.$id;
 
-            $container->setDefinition($this->nonceCacheId, new DefinitionDecorator('escape_wsse_authentication.nonce_cache'));
+            $container->setDefinition($this->nonceCacheId, new ChildDefinition('escape_wsse_authentication.nonce_cache'));
         }
 
         $providerId = 'escape_wsse_authentication.provider.'.$id;
 
         $container
-            ->setDefinition($providerId, new DefinitionDecorator('escape_wsse_authentication.provider'))
+            ->setDefinition($providerId, new ChildDefinition('escape_wsse_authentication.provider'))
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(2, $id)
             ->replaceArgument(3, new Reference($this->encoderId))
@@ -61,7 +61,7 @@ class Factory implements SecurityFactoryInterface
         $listenerId = 'escape_wsse_authentication.listener.'.$id;
 
         $container
-            ->setDefinition($listenerId, new DefinitionDecorator('escape_wsse_authentication.listener'))
+            ->setDefinition($listenerId, new ChildDefinition('escape_wsse_authentication.listener'))
             ->addArgument($id)
             ->addArgument(new Reference($entryPointId));
 
@@ -115,7 +115,7 @@ class Factory implements SecurityFactoryInterface
         $entryPointId = 'escape_wsse_authentication.entry_point.'.$id;
 
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('escape_wsse_authentication.entry_point'))
+            ->setDefinition($entryPointId, new ChildDefinition('escape_wsse_authentication.entry_point'))
             ->replaceArgument(1, $config['realm'])
             ->replaceArgument(2, $config['profile']);
 

@@ -20,7 +20,7 @@ env:
 
 cache:
     directories:
-      - $HOME/.composer/cache
+        - $HOME/.composer/cache
 
 before_install:
     - composer self-update
@@ -33,6 +33,6 @@ script:
     - ant test
 
 matrix:
-  allow_failures:
-    - env: SYMFONY_VERSION=dev-master
-    - php: nightly
+    allow_failures:
+        - env: SYMFONY_VERSION=dev-master
+        - php: nightly
